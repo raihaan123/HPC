@@ -1,0 +1,3 @@
+
+class ReactionDiffusion:
+    None
