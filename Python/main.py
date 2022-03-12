@@ -94,7 +94,7 @@ class ReactionDiffusion:
         # Check the new u and v
         print(f"u = {self.u}, v = {self.v}")
 
-
+    
     def _time_integrate(self):
 
         u = self.u
@@ -111,8 +111,6 @@ class ReactionDiffusion:
             for i in range(1, Nx-1):
                 u[i, j] += dt*((mu1/1) * (u[i+1, j] + u[i-1, j] + u[i, j+1] + u[i, j-1] - 4 * u[i, j]) + self._f1(u[i, j], v[i, j]))
                 v[i, j] += dt*((mu2/1) * (v[i+1, j] + v[i-1, j] + v[i, j+1] + v[i, j-1] - 4 * v[i, j]) + self._f2(u[i, j], v[i, j]))
-
-        # u += dt*((mu1/1) * (u[i+1, j] + u[i-1, j] + u[i, j+1] + u[i, j-1] - 4 * u[i, j]) + self._f1(u[i, j], v[i, j]))
 
 
     def plot(self):
