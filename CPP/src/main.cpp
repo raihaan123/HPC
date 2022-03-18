@@ -58,18 +58,6 @@ int main(int argc, const char *argv[]){
     // ReactionDiffusion myAwesomeSolver();
     // myAwesomeSolver.solve();
 
-    // Print the input parameters
-    std::cout << "Input parameters:" << std::endl;
-    std::cout << "dt = " << dt << std::endl;
-    std::cout << "T = " << T << std::endl;
-    std::cout << "Nx = " << Nx << std::endl;
-    std::cout << "Ny = " << Ny << std::endl;
-    std::cout << "a = " << a << std::endl;
-    std::cout << "b = " << b << std::endl;
-    std::cout << "mu1 = " << mu1 << std::endl;
-    std::cout << "mu2 = " << mu2 << std::endl;
-    std::cout << "eps = " << eps << std::endl;
-
     // Boost timer stop
     timer.stop();
 
