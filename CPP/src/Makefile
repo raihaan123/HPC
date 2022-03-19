@@ -2,7 +2,7 @@
 
 CC=g++
 CXXFLAGS=-Wall -O3 -pedantic
-LDLIBS=-lboost_program_options -lboost_timer
+LDLIBS=-lboost_program_options -lboost_timer -fopenmp
 TARGET=main
 
 VERBOSE=TRUE

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/timer/timer.hpp>
+#include <omp.h>
 
 // #include "ReactionDiffusion.h"
 
@@ -54,6 +55,61 @@ int main(int argc, const char *argv[]){
 
     // Boost timer start
     boost::timer::cpu_timer timer;
+
+    int nthreads, thread_id;
+
+    #pragma omp parallel private(thread_id)
+    {
+        thread_id = omp_get_thread_num();
+
+        #pragma omp master
+        {
+            nthreads = omp_get_num_threads();
+            std::cout << "Number of threads = " << nthreads << std::endl;
+        }
+
+        // each thread prints its ID
+        std::cout << "Hello World from thread " << thread_id << std::endl;
+    }
+    
+
+
+
+	// A is a square banded matrix of size Ny x Ny - store in banded form - has -2 on the diagonal and -1 on the off-diagonal
+    // So allocate A with 3 columns (3 diagonals) and Ny rows (Ny nodes in U and V)
+    double *A = new double[3*Ny];
+
+	// Set A as defined - note we are using symmetric banded storage
+    // Set first column = -2
+
+    // time this! use boost
+
+    boost::timer::cpu_timer timer2;
+
+
+    for (int i = 0; i < Ny; i++){
+        A[i*3] = -2.0;
+    }
+
+    // Set second column = -1
+    for (int i = 0; i < Ny; i++){
+        A[i*3 + 1] = -1.0;
+    }
+
+    // Print the A matrix
+    for (int i = 0; i < Ny; i++){
+        for (int j = 0; j < 3; j++){
+            std::cout << A[i*3 + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+    //prnt the time
+    std::cout << "Time to set A: " << timer2.format() << " seconds" << std::endl;
+
+
+
+
 
     // ReactionDiffusion myAwesomeSolver();
     // myAwesomeSolver.solve();
