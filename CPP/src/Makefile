@@ -1,17 +1,26 @@
 # Makefile!
 
-CC=g++
+CXX=g++
 CXXFLAGS=-Wall -O3 -pedantic
-LDLIBS=-lboost_program_options -lboost_timer -fopenmp
+LDLIBS=-fopenmp -lboost_program_options -lboost_timer
 TARGET=main
+OBJS=main.o ReactionDiffusion.o
+HDRS=ReactionDiffusion.h
 
 VERBOSE=TRUE
 
 
 default: $(TARGET)
-all: $(TARGET)
 
-$(TARGET).exe: $(TARGET)
+
+%.o : %.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) -o $@ -c $< $(LDLIBS)
+
+main: $(OBJS)
+	$(CXX) -o $@ $^ $(LDLIBS)
+
+
+all: $(TARGET)
 
 
 .PHONY: clean doc

@@ -6,7 +6,7 @@
 #include <boost/timer/timer.hpp>
 #include <omp.h>
 
-// #include "ReactionDiffusion.h"
+#include "ReactionDiffusion.h"
 
 namespace po = boost::program_options;
 
@@ -53,72 +53,24 @@ int main(int argc, const char *argv[]){
 
     std::cout << "Welcome to the Reaction-Diffusion Solver! Brace yourself for epic speeds..." << std::endl;
 
-    // Boost timer start
-    boost::timer::cpu_timer timer;
 
-    int nthreads, thread_id;
+    // Initializing the solver class
+    ReactionDiffusion myAwesomeSolver;
 
-    #pragma omp parallel private(thread_id)
-    {
-        thread_id = omp_get_thread_num();
+    // Setting the parameters
+    myAwesomeSolver.setParameters(dt, T, Nx, Ny, a, b, mu1, mu2, eps);
 
-        #pragma omp master
-        {
-            nthreads = omp_get_num_threads();
-            std::cout << "Number of threads = " << nthreads << std::endl;
-        }
+    // Setting the initial conditions
+    myAwesomeSolver.setInitialConditions();
 
-        // each thread prints its ID
-        std::cout << "Hello World from thread " << thread_id << std::endl;
-    }
-    
+    // Solving the PDEs!
+    myAwesomeSolver.solve();
+
+    // Writing the solution to output.txt
+    // myAwesomeSolver.writeToFile();
 
 
-
-	// A is a square banded matrix of size Ny x Ny - store in banded form - has -2 on the diagonal and -1 on the off-diagonal
-    // So allocate A with 3 columns (3 diagonals) and Ny rows (Ny nodes in U and V)
-    double *A = new double[3*Ny];
-
-	// Set A as defined - note we are using symmetric banded storage
-    // Set first column = -2
-
-    // time this! use boost
-
-    boost::timer::cpu_timer timer2;
-
-
-    for (int i = 0; i < Ny; i++){
-        A[i*3] = -2.0;
-    }
-
-    // Set second column = -1
-    for (int i = 0; i < Ny; i++){
-        A[i*3 + 1] = -1.0;
-    }
-
-    // Print the A matrix
-    for (int i = 0; i < Ny; i++){
-        for (int j = 0; j < 3; j++){
-            std::cout << A[i*3 + j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    
-    //prnt the time
-    std::cout << "Time to set A: " << timer2.format() << " seconds" << std::endl;
-
-
-
-
-
-    // ReactionDiffusion myAwesomeSolver();
-    // myAwesomeSolver.solve();
-
-    // Boost timer stop
-    timer.stop();
-
-    std::cout << "Solved!" << std::endl;
-    std::cout << "Time taken: " << timer.format() << std::endl;
+    std::cout << "Bye!" << std::endl;
 
     return 0;
 

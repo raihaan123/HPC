@@ -3,6 +3,21 @@
 
 class ReactionDiffusion{
 	private:
+		// Methods
+		void TimeIntegrate();
+
+		// Parameters
+		double dt;
+		double T;
+		int Nx;
+		int Ny;
+		double a;
+		double b;
+		double mu1;
+		double mu2;
+		double eps;
+
+
 		// U and V are double matrices of size Nx x Ny - represent the solution of the PDEs
 		double *U, *V;
 
@@ -15,13 +30,15 @@ class ReactionDiffusion{
 		
 	public:
 		// Constructor
-		ReactionDiffusion(double dt, double T, int Nx, int Ny, double a, double b, double mu1, double mu2, double eps);
+		ReactionDiffusion();
 
-		void TimeIntegrate();
-		void SetParameters(double dt, double T, int Nx, int Ny, double a, double b, double mu1, double mu2, double eps);
-		void SetInitialConditions(double *U, double *V);
+		// Destructor
+		~ReactionDiffusion();
 
+		void setParameters(double dt, double T, int Nx, int Ny, double a, double b, double mu1, double mu2, double eps);		
+		void setInitialConditions();
 		void solve();
+		void writeToFile();
 };
 
 #endif
