@@ -17,6 +17,10 @@ class ReactionDiffusion{
 		double mu2;
 		double eps;
 
+		// dx and dy are const
+		const double dx = 1.0;
+		const double dy = 1.0;
+
 
 		// U and V are double matrices of size Nx x Ny - represent the solution of the PDEs
 		double *U, *V;

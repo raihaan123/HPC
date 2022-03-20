@@ -4,16 +4,14 @@
 #include <fstream>
 #include <boost/timer/timer.hpp>
 
-
 #include <omp.h>
 
 
 // blas definitions
 #define F77NAME(x) x##_
 
-// Symmetric banded matrix A multiplication with a full matrix U - use dsbmv
+// Symmetric banded matrix A multiplication with a full matrix U - use dsbmv!
 extern "C" {
-
 	void F77NAME(dsbmv)(const char *uplo, const int *n, const int *k,
 						const double *alpha, const double *A, const int *lda,
 						const double *x, const int *incx, const double *beta,
@@ -76,16 +74,14 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	// End timer
 	std::cout << "Time to set A: " << FillingMatrix.format() << " seconds" << std::endl;
 
-    // Print the A matrix
-    for (int i = 0; i < Ny; i++){
-        for (int j = 0; j < 3; j++){
-            std::cout << A[i*3 + j] << " ";
-        }
-        std::cout << std::endl;
-    }
+    // // Print the A matrix
+    // for (int i = 0; i < Ny; i++){
+    //     for (int j = 0; j < 3; j++){
+    //         std::cout << A[i*3 + j] << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
 
-	// Set initial conditions
-	setInitialConditions();
 }
 
 
@@ -94,35 +90,55 @@ void ReactionDiffusion::setInitialConditions(){
 	// Set the initial conditions to U and V
 	// For y>ly/2, U = 1, 0 everywhere else
 	// For x<lx/2, V = a/2, 0 everywhere else
-	// note x and y are the 'coordinates' of the grid points - not the actual x and y values - of U and V elements
+
+	// Lx and Ly are always integers - Nx and Ny are odd integers
+	const int Ly = (Ny-1)*dx;
+	const int Lx = (Nx-1)*dx;
+
+	const int row_bound = Ly/2;		// The first row of U equal to 0 (from the top)
+	const int col_bound = Lx/2;		// The first column of V equal to 0 (from the left)
+
+	// Allocate memory for U and V - all zero
+	U = new double[Nx*Ny];
+	V = new double[Nx*Ny];
+
+	// All zero elements
 	for (int i = 0; i < Nx*Ny; i++){
-		int x = i % Nx;
-		int y = i / Nx;
+		U[i] = 0.0;
+		V[i] = 0.0;
+	}
+	
+	// Set the initial conditions
+	boost::timer::cpu_timer InitialConditions;
+	for (int row = 0; row < Nx; ++row){
+		for (int col = 0; col < Ny; ++col){
+			if (row < row_bound){
+				U[row*Ny + col] = 1.0;
+			}
 
-		if (y > Ny/2){
-			U[i] = 1.0;
-			V[i] = 0.0;
-		}
-		else{
-			U[i] = 0.0;
-			V[i] = 0.0;
-		}
-
-		if (x < Nx/2){
-			U[i] = 0.0;
-			V[i] = a/2.0;
+			if (col < col_bound){
+				V[row*Ny + col] = a/2.0;
+			}
 		}
 	}
+	std::cout << "Time to set initial conditions: " << InitialConditions.format() << " seconds" << std::endl;
 
-	// Print the initial conditions
-	std::cout << "Initial conditions:" << std::endl;
-	// first u 
-	for (int i = 0; i < Nx; i++){
-		for (int j = 0; j < Ny; j++){
-			std::cout << U[i*Ny + j] << " ";
-		}
-		std::cout << std::endl;
-	}
+	// // Print the initial conditions
+	// std::cout << "Initial conditions:" << std::endl;
+	// //print u
+	// for (int row = 0; row < Nx; ++row){
+	// 	for (int col = 0; col < Ny; ++col){
+	// 		std::cout << U[row*Ny + col] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
+	// // print v
+	// for (int row = 0; row < Nx; ++row){
+	// 	for (int col = 0; col < Ny; ++col){
+	// 		std::cout << V[row*Ny + col] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
 
 }
 
@@ -130,13 +146,11 @@ void ReactionDiffusion::setInitialConditions(){
 
 // Solver
 void ReactionDiffusion::solve(){
-	// Print hi
-	std::cout << "Hi!" << std::endl;
+	std::cout << "Called solver!" << std::endl;
 }
 
 
 void ReactionDiffusion::writeToFile(){
-	
 	std::ofstream outfile;
 	outfile.open("output.txt");
 

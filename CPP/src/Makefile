@@ -27,7 +27,7 @@ all: $(TARGET)
 
 
 run: $(TARGET)
-	./$(TARGET) --dt 0.001 --T 10.0 --Nx 101 --Ny 101 --a 0.75 --b 0.06 --mu1 5.0 --mu2 0.0 --eps 50.0
+	./$(TARGET) --dt 0.001 --T 10.0 --Nx 11 --Ny 11 --a 0.75 --b 0.06 --mu1 5.0 --mu2 0.0 --eps 50.0
 
 
 clean:
