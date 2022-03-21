@@ -1,8 +1,8 @@
 # Makefile!
 
 CXX=g++
-CXXFLAGS=-Wall -O3 -pedantic
-LDLIBS=-fopenmp -lboost_program_options -lboost_timer
+CXXFLAGS=-g -Wall -O3 -pedantic
+LDLIBS=-fopenmp -lboost_program_options -lboost_timer -lblas
 TARGET=main
 OBJS=main.o ReactionDiffusion.o
 HDRS=ReactionDiffusion.h

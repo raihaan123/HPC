@@ -4,6 +4,8 @@
 class ReactionDiffusion{
 	private:
 		// Methods
+		void f1();
+		void f2();
 		void TimeIntegrate();
 
 		// Parameters
@@ -31,6 +33,9 @@ class ReactionDiffusion{
 		// Shift matrix A
 		double *A;
 
+		// Full size A
+		double *A_full;
+
 		
 	public:
 		// Constructor
@@ -44,5 +49,10 @@ class ReactionDiffusion{
 		void solve();
 		void writeToFile();
 };
+
+
+// Helper functions
+void printFullMatrix(double *A, int Nx, int Ny);
+void printBandedSymmetricMatrix(double* A, int N);
 
 #endif
