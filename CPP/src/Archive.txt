@@ -1,3 +1,39 @@
+
+	// testing the matrix multiplication funnction void TwoByTwo(double* A, int lda, double* B, int ldb, double* C);
+	double* A = new double[4];
+	double* B = new double[4];
+	double* C = new double[4];
+
+	A[0] = 1.0;
+	A[1] = 2.0;
+	A[2] = 3.0;
+	A[3] = 4.0;
+
+	B[0] = 5.0;
+	B[1] = 6.0;
+	B[2] = 7.0;
+	B[3] = 8.0;
+
+	TwoByTwo(A, 2, B, 2, C);
+
+	std::cout << "A matrix:\n" << std::endl;
+	printFullMatrix(A, 2, 2);
+
+	std::cout << "B matrix:\n" << std::endl;
+	printFullMatrix(B, 2, 2);
+
+	std::cout << "C matrix:\n" << std::endl;
+	printFullMatrix(C, 2, 2);
+
+
+
+
+
+
+
+
+
+
 // // Print the input parameters
 // std::cout << "Input parameters:" << std::endl;
 // std::cout << "dt = " << dt << std::endl;
@@ -12,21 +48,28 @@
 
 // Some OpenMP fun!
 
-// int nthreads, thread_id;
 
-// #pragma omp parallel private(thread_id)
-// {
-//     thread_id = omp_get_thread_num();
 
-//     #pragma omp master
-//     {
-//         nthreads = omp_get_num_threads();
-//         std::cout << "Number of threads = " << nthreads << std::endl;
-//     }
+void ReactionDiffusion::openmp_fun(){
 
-//     // each thread prints its ID
-//     std::cout << "Hello World from thread " << thread_id << std::endl;
-// }
+	int nthreads, thread_id;
+
+	#pragma omp parallel private(thread_id)
+	{
+		thread_id = omp_get_thread_num();
+
+		#pragma omp master
+		{
+			nthreads = omp_get_num_threads();
+			std::cout << "Number of threads = " << nthreads << std::endl;
+		}
+
+		// each thread prints its ID
+		#pragma omp critical
+		std::cout << "Hello World from thread " << thread_id << std::endl;
+	}
+
+}
 
 
 
@@ -214,3 +257,40 @@ SOLVER
 	F77NAME(dgemm)("N", "N", 2, 2, 2, 1, A, 2, I+5, 5, 0, C, 2);
 
 	printFullMatrix(C, 2, 2);
+
+
+
+
+
+
+
+
+
+
+
+				// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
+		//  #pragma omp parallel
+		//  {
+		//  	#pragma omp single
+		//  	{
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+		// 		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+		//  		}
+		//  	}
+		//  }

@@ -64,6 +64,7 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	A[2] = 1.0;
 	A[3] = -1.0;
 
+	std::cout << "Matrix A: " << std::endl;
 	printFullMatrix(A, 2, 2);
 
 }
@@ -91,6 +92,10 @@ void ReactionDiffusion::setInitialConditions(){
 	U = new double[Nx*Ny];
 	V = new double[Nx*Ny];
 
+	// Allocate memory for f1 and f2
+	f1 = new double[Nx*Ny];
+	f2 = new double[Nx*Ny];
+
 	// All zero elements
 	for (int i = 0; i < Nx*Ny; i++){
 		U[i] = 0.0;
@@ -110,7 +115,7 @@ void ReactionDiffusion::setInitialConditions(){
 			}
 		}
 	}
-	std::cout << "Time to set initial conditions: " << InitialConditions.format() << " seconds" << std::endl;
+	std::cout << "\nTime to set initial conditions: " << InitialConditions.format() << " seconds" << std::endl;
 
 	// // Print the initial conditions
 	// std::cout << "U matrix (Initial):\n" << std::endl;
@@ -123,12 +128,32 @@ void ReactionDiffusion::setInitialConditions(){
 
 
 // Reaction terms for the PDEs
-double ReactionDiffusion::f1(double& u, double& v){
+// void ReactionDiffusion::solve_f1(){
+// 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
+// 	for (int row = 0; row < Nx; ++row){
+// 		for (int col = 0; col < Ny; ++col){
+// 			f1[row*Ny + col] = eps * U[row*Ny + col] * (1.0 - U[row*Ny + col]) * (U[row*Ny + col] - (V[row*Ny + col] + b)/a);
+// 		}
+// 	}
+// }
+
+double ReactionDiffusion::solve_f1(double& u, double& v){
+	// return eps * u * (1.0 - u) * (u - (v + b)/a);
 	return eps * u * (1.0 - u) * (u - (v + b)/a);
 }
 
 
-double ReactionDiffusion::f2(double& u, double& v){
+// void ReactionDiffusion::solve_f2(){
+// 	// return u * u * u - v;
+// 	for (int row = 0; row < Nx; ++row){
+// 		for (int col = 0; col < Ny; ++col){
+// 			f2[row*Ny + col] = U[row*Ny + col] * U[row*Ny + col] * U[row*Ny + col] - V[row*Ny + col];
+// 		}
+// 	}
+// }
+
+double ReactionDiffusion::solve_f2(double& u, double& v){
+	// return u * u * u - v;
 	return u * u * u - v;
 }
 
@@ -145,65 +170,82 @@ double ReactionDiffusion::f2(double& u, double& v){
 */
 
 
-
-
 void ReactionDiffusion::solve()
 {
 
+	temp1 = new double[2*2];
+	temp2 = new double[2*2];
+	temp3 = new double[2*2];
+	temp4 = new double[2*2];
+
+	temp12 = new double[2*2];
+	temp34 = new double[2*2];
+
 	boost::timer::cpu_timer Solver;
 
-	for (double t = 0; t <= T; t += dt){	
+	for (double t = dt; t <= T; t += dt){	
 		
-		// f1 and f2 tasks
-		for (int node = 0; node < Nx*Ny; ++node){
-			// Calculate the reaction terms
-			dU[node] = f1(U[node], V[node]);
-			dV[node] = f2(U[node], V[node]);
+		// // Recalculate f1 and f2
+		// solve_f1();
+		// solve_f2();
 
+		// Reset the dU and dV arrays
+		for (int i = 0; i < Nx*Ny; i++){
+			dU[i] = 0.0;
+			dV[i] = 0.0;
 		}
 
-			// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
-		//  #pragma omp parallel
-		//  {
-		//  	#pragma omp single
-		//  	{
-		//  		#pragma omp task
-		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-		// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
-		// 		}
+		// Each thread will have a private temp1 temp2 temp3 temp4 arrays of size 2x2 - these will be used to store the results of the twobytwo matrix multiplication
+		// The result will be added to the dU and dV arrays after all the cells have been solved and the threads are rejoined
 
-		//  		#pragma omp task
-		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
-		//  		}
+		// Iterate through the cells - note will need a loop over the rows and columns of the grid to Nx-1 and row*Ny-1
+		// #pragma omp parallel for schedule(dynamic)
+		for (int row = 0; row < Ny-1; ++row){
+			// #pragma omp parallel for
+			for (int cell = row*Nx; cell < (row+1)*Nx-1; ++cell){
 
-		//  		#pragma omp task
-		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
-		//  		}
-
-		//  		#pragma omp task
-		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
-		//  		}
-		//  	}
-		//  }
-
-		// Non-parallel version
-		// #pragma omp parallel for
-		for (int row = 0; row < Nx-1; ++row){
-			for (int cell = row*Ny; cell < (row+1)*Ny-2; ++cell){
-				// std::cout << "Cell: " << cell << std::endl;
 				// For U
-				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
-				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0,	&dU[cell], Ny);
+				TwoByTwo(A, 2, &U[cell], Nx, temp1);
+				TwoByTwo(&U[cell], Nx, A, 2, temp2);
 
+				// temp12 = temp1 + temp2
+				for (int i = 0; i < 2*2; i++){
+					temp12[i] = temp1[i] + temp2[i];
+				}
+				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Nx, 1.0, &dU[cell], Nx);
+				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Nx, A, 2, 1.0,	&dU[cell], Nx);
+				
 				// For V
-				F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
-				F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+				TwoByTwo(A, 2, &V[cell], Nx, temp3);
+				TwoByTwo(&V[cell], Nx, A, 2, temp4);
+
+				// temp34 = temp3 + temp4
+				for (int i = 0; i < 2*2; i++){
+					temp34[i] = temp3[i] + temp4[i];
+				}
+				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Nx, 1.0, &dV[cell], Nx);
+				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Nx, A, 2, 1.0, &dV[cell], Nx);
+
+				// Add the results to the dU and dV arrays
+				// #pragma omp parallel for
+
+				# pragma omp critical
+				for (int y_shift = 0; y_shift < 2; ++y_shift){
+					for (int x_shift = 0; x_shift < 2; ++x_shift){
+						dU[cell + x_shift + y_shift*Nx] += mu1 * temp12[x_shift + y_shift*2] + solve_f1(U[cell + x_shift + y_shift*Nx], V[cell + x_shift + y_shift*Nx]);
+						dV[cell + x_shift + y_shift*Nx] += mu2 * temp34[x_shift + y_shift*2] + solve_f2(U[cell + x_shift + y_shift*Nx], V[cell + x_shift + y_shift*Nx]);
+					}
+				}
+
+				// for (int i = 0; i < 2; ++i){
+				// 	for (int j = 0; j < 2; ++j){
+				// 		std::cout << "dU[" << cell + i*Ny + j << "] = " << dU[cell + i*Ny + j] << std::endl;
+				// 	}
+				// }
+			
+			// std::cout << "Row: " << row << std::endl;
 
 			}
-			// std::cout << "Row: " << row << std::endl;
 
 		}
 
@@ -214,11 +256,11 @@ void ReactionDiffusion::solve()
 		}
 
 		std::cout << "Solver Time: " << t << std::endl;
+		
 	}
-
+	
 	printFullMatrix(U, Nx, Ny);
 	std::cout << "Time to solve: " << Solver.format() << " seconds" << std::endl;
-
 }
 
 
@@ -247,11 +289,6 @@ void ReactionDiffusion::writeToFile(){
 
 
 
-
-
-
-
-
 /* Helper functions! */
 
 void printFullMatrix(double* A, int Nx, int Ny){
@@ -271,6 +308,21 @@ void printBandedSymmetricMatrix(double* A, int N){
         std::cout << std::endl;
     }
 
+}
+
+
+// TwoByTwoMatrixMultiplication - multiplies two 2x2 matrices and returns the result in a 2x2 matrix - all matrices are stored in row major order
+void TwoByTwo(double* A, int lda, double* B, int ldb, double* C){
+
+	// Multiply the two matrices
+	for (int col = 0; col < 2; ++col){
+		for (int row = 0; row < 2; ++row){
+			C[0] = A[0] * B[0] + A[1] * B[ldb];
+			C[1] = A[0] * B[1] + A[1] * B[1 + ldb];
+			C[2] = A[lda] * B[0] + A[1 + lda] * B[ldb];
+			C[3] = A[lda] * B[1] + A[1 + lda] * B[1 + ldb];
+		}
+	}
 }
 
 

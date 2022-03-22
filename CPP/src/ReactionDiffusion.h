@@ -4,9 +4,11 @@
 class ReactionDiffusion{
 	private:
 		// Methods
-		double f1(double& u, double& v);
-		double f2(double& u, double& v);
-		double Laplacian(double* node);
+		double solve_f1(double& u, double& v);
+		double solve_f2(double& u, double& v);
+		// void solve_f1();
+		// void solve_f2();
+		// double Laplacian(double* node);
 		void TimeIntegrate();
 
 		// Parameters
@@ -30,10 +32,20 @@ class ReactionDiffusion{
 		// Derivative of U and V
 		double *dU, *dV;
 
+		// f1 and f2
+		double *f1, *f2;
+
 		// Shift matrix A
 		double *A;
-		double *C;
-		double *I;
+
+		// Solver temp variables
+		double* temp1;
+		double* temp2;
+		double* temp3;
+		double* temp4;
+
+		double* temp12;
+		double* temp34;
 		
 	public:
 		// Constructor
@@ -46,10 +58,12 @@ class ReactionDiffusion{
 		void setInitialConditions();
 		void solve();
 		void writeToFile();
+		// void openmp_fun();
 };
 
 
 // Helper functions
+void TwoByTwo(double* A, int lda, double* B, int ldb, double* C);
 void printFullMatrix(double *A, int Nx, int Ny);
 void printBandedSymmetricMatrix(double* A, int N);
 void GNUPlot();

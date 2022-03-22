@@ -65,7 +65,7 @@ int main(int argc, const char *argv[]){
 
     // Solving the PDEs!
     myAwesomeSolver.solve();
-
+    
     // Writing the solution to output.txt
     myAwesomeSolver.writeToFile();
 
