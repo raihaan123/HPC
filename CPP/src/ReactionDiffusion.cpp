@@ -191,15 +191,19 @@ void ReactionDiffusion::solve()
 
 		// Non-parallel version
 		// #pragma omp parallel for
-		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		for (int row = 0; row < Nx-1; ++row){
+			for (int cell = row*Ny; cell < (row+1)*Ny-2; ++cell){
+				// std::cout << "Cell: " << cell << std::endl;
+				// For U
+				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0,	&dU[cell], Ny);
 
-			// For U
-			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
-			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0,	&dU[cell], Ny);
+				// For V
+				F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+				F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
 
-			// For V
-			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
-			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+			}
+			// std::cout << "Row: " << row << std::endl;
 
 		}
 
