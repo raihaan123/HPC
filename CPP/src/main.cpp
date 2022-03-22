@@ -67,7 +67,7 @@ int main(int argc, const char *argv[]){
     myAwesomeSolver.solve();
 
     // Writing the solution to output.txt
-    // myAwesomeSolver.writeToFile();
+    myAwesomeSolver.writeToFile();
 
 
     std::cout << "Bye!" << std::endl;

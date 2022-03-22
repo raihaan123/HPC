@@ -152,68 +152,68 @@ void ReactionDiffusion::solve()
 
 	boost::timer::cpu_timer Solver;
 
-	for (int node = 0; node < Nx*Ny; ++node){
-		// Calculate the reaction terms
-		dU[node] = f1(U[node], V[node]);
-		dV[node] = f2(U[node], V[node]);
+	for (double t = 0; t <= T; t += dt){	
+		
+		// f1 and f2 tasks
+		for (int node = 0; node < Nx*Ny; ++node){
+			// Calculate the reaction terms
+			dU[node] = f1(U[node], V[node]);
+			dV[node] = f2(U[node], V[node]);
 
-		// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
+		}
+
+			// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
+		//  #pragma omp parallel
+		//  {
+		//  	#pragma omp single
+		//  	{
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+		// 		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+		//  		}
+		//  	}
+		//  }
+
+		// Non-parallel version
+		// #pragma omp parallel for
+		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+
+			// For U
+			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0,	&dU[cell], Ny);
+
+			// For V
+			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+
+		}
+
+		// Update the U and V arrays
+		for (int node = 0; node < Nx*Ny; ++node){
+			U[node] += dt * dU[node];
+			V[node] += dt * dV[node];
+		}
+
+		std::cout << "Solver Time: " << t << std::endl;
 	}
 
-	// #pragma omp parallel
-	// {
-	// 	#pragma omp single
-	// 	{
-	// 		#pragma omp task
-	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-
-	// 				// For U
-	// 				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
-	// 			}
-
-	// 		#pragma omp task
-	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-				
-	// 			// Reverse the order of matrix multiplication
-	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
-	// 		}
-
-	// 		#pragma omp task
-	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-	// 			// For V
-	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
-	// 		}
-
-	// 		#pragma omp task
-	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-	// 			// Reverse the order of matrix multiplication
-	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
-	// 		}
-	// 	}
-	// }
-
-	// Non-parallel version
-	#pragma omp parallel for schedule(static)
-	for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
-
-		// For U
-		F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
-		// Reverse the order of matrix multiplication
-		F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
-
-		// For V
-		F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
-		// Reverse the order of matrix multiplication
-		F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
-	}
-
-
-	printFullMatrix(dV, Nx, Ny);
-	std::cout << "Time to calculate reaction terms: " << Solver.format() << " seconds" << std::endl;
-
-
-
-
+	printFullMatrix(U, Nx, Ny);
+	std::cout << "Time to solve: " << Solver.format() << " seconds" << std::endl;
 
 }
 
@@ -226,13 +226,13 @@ void ReactionDiffusion::writeToFile(){
 	std::ofstream outfile;
 	outfile.open("output.txt");
 
-	// Print the solution to the file
-	for (int i = 0; i < Nx*Ny; i++){
-		outfile << U[i] << " ";
+	// Print the solution to the file - format: x y u v
+	for (int row = 0; row < Nx; ++row){
+		for (int col = 0; col < Ny; ++col){
+			outfile << row*dx << " " << col*dy << " " << U[row*Ny + col] << " " << V[row*Ny + col] << std::endl;
+		}
 	}
-	outfile << std::endl;
 
-	// Close the file
 	outfile.close();
 }
 
