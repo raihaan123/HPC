@@ -4,8 +4,9 @@
 class ReactionDiffusion{
 	private:
 		// Methods
-		void f1();
-		void f2();
+		double f1(double& u, double& v);
+		double f2(double& u, double& v);
+		double Laplacian(double* node);
 		void TimeIntegrate();
 
 		// Parameters
@@ -23,7 +24,6 @@ class ReactionDiffusion{
 		const double dx = 1.0;
 		const double dy = 1.0;
 
-
 		// U and V are double matrices of size Nx x Ny - represent the solution of the PDEs
 		double *U, *V;
 
@@ -32,10 +32,8 @@ class ReactionDiffusion{
 
 		// Shift matrix A
 		double *A;
-
-		// Full size A
-		double *A_full;
-
+		double *C;
+		double *I;
 		
 	public:
 		// Constructor
@@ -54,5 +52,6 @@ class ReactionDiffusion{
 // Helper functions
 void printFullMatrix(double *A, int Nx, int Ny);
 void printBandedSymmetricMatrix(double* A, int N);
+void GNUPlot();
 
 #endif

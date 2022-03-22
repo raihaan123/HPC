@@ -5,24 +5,19 @@
 #include <boost/timer/timer.hpp>
 
 #include <omp.h>
-#include <cblas.h>
+// #include <cblas.h>
 
-
-// blas definitions
 #define F77NAME(x) x##_
 
-// Symmetric banded matrix A multiplication with a full matrix U - use dsbmv!
+// Matrix matrix multiplication with BLAS
 extern "C" {
-	void F77NAME(dsbmv)(const char *uplo, const int *n, const int *k,
-						const double *alpha, const double *A, const int *lda,
-						const double *x, const int *incx, const double *beta,
-						double *y, const int *incy);
-
-	void F77NAME(dgemm)(const char *transa, const char *transb, const int *m, const int *n, const int *k,
-						const double *alpha, const double *A, const int *lda,
-						const double *B, const int *ldb, const double *beta,
-						double *C, const int *ldc);
+	void F77NAME(dgemm)(char *transa, char *transb,
+						const int& m, const int& n, const int& k,
+						const double& alpha, double *a,
+						const int& lda, double *b, const int& ldb,
+						const double& beta, double *c, const int& ldc);
 }
+
 
 // Constructor with initializer list
 ReactionDiffusion::ReactionDiffusion(){
@@ -37,7 +32,6 @@ ReactionDiffusion::~ReactionDiffusion(){
 	// Free memory
 	delete[] U;
 	delete[] V;
-	delete[] A;
 }
 
 
@@ -61,73 +55,16 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	dU = new double[Nx*Ny];
 	dV = new double[Nx*Ny];
 
-	// A is a square symmetric banded matrix of size Ny x Ny - store in banded form - has -2 on the diagonal and -1 on the off-diagonal
-	double *A = new double[2*Ny];
+	// Allocate memory for A (2x2 general matrix)
+	A = new double[2*2];
 
-	// Full size A matrix
-	double *A_full = new double[Ny*Ny];
+	// Building the fundamental shift matrix A
+	A[0] = -1.0;
+	A[1] = 1.0;
+	A[2] = 1.0;
+	A[3] = -1.0;
 
-	// Boost timer start
-	boost::timer::cpu_timer FillingMatrix;
-
-	/*
-	Populate the matrix A!
-	----------------------
-
-	First row is all 1s from 2 to Ny
-	Second row is -1 at start and finish, and -2 at the middle
-
-	*/
-
-	// Superdiagonal
-	A[0] = 0.0;
-	for (int col = 1; col < Ny; col++){
-		A[col] = 1.0;
-	}
-	
-	// Main diagonal
-	for (int col = 0; col < Ny-1; col++){
-		A[Ny + col] = -2.0;
-	}
-
-	// Neumann boundary conditions
-	A[Ny] = -1.0;
-	A[Ny*2 - 1] = -1.0;
-
-	// End timer
-	std::cout << "Time to set A: " << FillingMatrix.format() << " seconds" << std::endl;
-
-    // Print the A matrix (nicely formatted!)
-	// std::cout << "A matrix:" << std::endl;
-    // printBandedSymmetricMatrix(A, Ny);
-
-	// A_full is the full matrix A - main diagonal is all -2s and 1st super diagonal is all 1s - all else 0 - symmetric
-	boost::timer::cpu_timer FillingMatrix2;
-
-	for (int row = 0; row < Ny; row++){
-		for (int col = 0; col < Ny; col++){
-			if (row == col){
-				A_full[row*Ny + col] = -2.0;
-			}
-			else if (row == col - 1 || row == col + 1){
-				A_full[row*Ny + col] = 1.0;
-			}
-			else{
-				A_full[row*Ny + col] = 0.0;
-			}
-		}
-	}
-
-	// Neumann boundary conditions
-	A_full[0] = -1.0;
-	A_full[Ny*Ny-1] = -1.0;
-
-	// End timer
-	std::cout << "Time to set A_full: " << FillingMatrix2.format() << " seconds" << std::endl;
-
-	// Print the A_full matrix
-	// std::cout << "A_full matrix:" << std::endl;
-	// printFullMatrix(A_full, Ny, Ny);
+	printFullMatrix(A, 2, 2);
 
 }
 
@@ -175,112 +112,114 @@ void ReactionDiffusion::setInitialConditions(){
 	}
 	std::cout << "Time to set initial conditions: " << InitialConditions.format() << " seconds" << std::endl;
 
-	// Print the initial conditions
-	std::cout << "Initial conditions:" << std::endl;
-	//print u
-	for (int row = 0; row < Nx; ++row){
-		for (int col = 0; col < Ny; ++col){
-			std::cout << U[row*Ny + col] << " ";
-		}
-		std::cout << std::endl;
-	}
-	// print v
-	for (int row = 0; row < Nx; ++row){
-		for (int col = 0; col < Ny; ++col){
-			std::cout << V[row*Ny + col] << " ";
-		}
-		std::cout << std::endl;
-	}
+	// // Print the initial conditions
+	// std::cout << "U matrix (Initial):\n" << std::endl;
+	// printFullMatrix(U, Nx, Ny);
+
+	// std::cout << "V matrix (Intial):\n" << std::endl;
+	// printFullMatrix(V, Nx, Ny);
 
 }
 
 
 // Reaction terms for the PDEs
-void ReactionDiffusion::f1(){
-	// epsilon * u * (1-u) * (u - (v+b)/a)
-	for (int row = 0; row < Nx; ++row){
-		for (int col = 0; col < Ny; ++col){
-			dU[row*Ny + col] += eps * U[row*Ny + col] * (1.0 - U[row*Ny + col]) * (U[row*Ny + col] - (V[row*Ny + col] + b)/a);
-			std::cout <<"dU[" << row*Ny + col << "] = " << dU[row*Ny + col] << std::endl;
-		}
-	}
-}
-
-void ReactionDiffusion::f2(){
-	// u**3 - v
-	for (int row = 0; row < Nx; ++row){
-		for (int col = 0; col < Ny; ++col){
-			dV[row*Ny + col] += U[row*Ny + col]*U[row*Ny + col]*U[row*Ny + col] - V[row*Ny + col];
-			std::cout <<"dV[" << row*Ny + col << "] = " << dV[row*Ny + col] << std::endl;
-		}
-	}
+double ReactionDiffusion::f1(double& u, double& v){
+	return eps * u * (1.0 - u) * (u - (v + b)/a);
 }
 
 
-// Solver
-void ReactionDiffusion::solve(){
-	std::cout << "Called solver!" << std::endl;
+double ReactionDiffusion::f2(double& u, double& v){
+	return u * u * u - v;
+}
 
-	// Allocate memory for dU and dV
-	dU = new double[Nx*Ny];
-	dV = new double[Nx*Ny];
 
-	// for loop from 0 to T in steps of dt
-	for (int t = 0; t <= T; t += dt){
+/* Solver
 
-		// Evaluate the reaction terms - methods with save results in dU and dV
-		f1();
-		f2();
+--> The solution domain will be grouped into 'cells' of size dx*dy=1*1 - so 4 nodes per cell - so in total (Nx-1)*(Ny-1) cells
+--> Each cell will be solved independently - these will be OpenMP tasks allocated to the team of threads
+	--> f1 and f2 will be solved for each node in the cell - added to the dU and dV arrays
+	--> A simplified Laplacian function will be applied to each node in the cell (AU + UA and AV + VA) - also added to the dU and dV arrays (reduced)
+	-->	Once all the cells have been solved, the dU and dV arrays will update the U and V arrays respectively
+--> The threads will be decoupled from any specific cell - they will be assigned to cells in a round-robin fashion
 
-		// mu1*(A*U + U*A) + f1
-		// mu2*(A*V + V*A) + f2
+*/
 
-		// k is the number of super-diagonals in the matrix A
-		const int k = 1;
 
-		// F77NAME(dsbmv)("U", &Ny, &k, &mu1, A, &Ny, U, &inc, &zero, dU, &inc);
 
-		// Using cblas_dsbmv for one row of U at a time (not the whole matrix) - using a for loop
-		for (int row = 0; row < Nx; ++row){
 
-			// Note that beta = 1 because we are adding to dU (f1 is already in dU)
-			std::cout << "Gulp!" << std::endl;
-			cblas_dgemv(CblasRowMajor, CblasNoTrans, Ny, k, mu1, A_full, Ny, &U[row*Ny], 1, 1, &dU[row*Ny], 1);
-			std::cout << "survived dsbmv" << std::endl;
+void ReactionDiffusion::solve()
+{
 
-			// same for v
-			cblas_dgemv(CblasRowMajor, CblasNoTrans, Ny, k, mu2, A_full, Ny, &V[row*Ny], 1, 1, &dV[row*Ny], 1);
-		
-		}
+	boost::timer::cpu_timer Solver;
 
-		// Update U
-		for (int row = 0; row < Nx; ++row){
-			for (int col = 0; col < Ny; ++col){
-				U[row*Ny + col] += dt * dU[row*Ny + col];
-			}
-		}
-		std::cout << "survived U update" << std::endl;
+	for (int node = 0; node < Nx*Ny; ++node){
+		// Calculate the reaction terms
+		dU[node] = f1(U[node], V[node]);
+		dV[node] = f2(U[node], V[node]);
 
-		// Update V
-		for (int row = 0; row < Nx; ++row){
-			for (int col = 0; col < Ny; ++col){
-				V[row*Ny + col] += dt * dV[row*Ny + col];
-			}
-		}
-		std::cout << "survived V update" << std::endl;
-
+		// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
 	}
-	
 
-	//print the solution
-	for (int row = 0; row < Nx; ++row){
-		for (int col = 0; col < Ny; ++col){
-			std::cout << U[row*Ny + col] << " ";
-		}
-		std::cout << std::endl;
+	// #pragma omp parallel
+	// {
+	// 	#pragma omp single
+	// 	{
+	// 		#pragma omp task
+	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+
+	// 				// For U
+	// 				F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+	// 			}
+
+	// 		#pragma omp task
+	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+				
+	// 			// Reverse the order of matrix multiplication
+	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
+	// 		}
+
+	// 		#pragma omp task
+	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+	// 			// For V
+	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+	// 		}
+
+	// 		#pragma omp task
+	// 		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+	// 			// Reverse the order of matrix multiplication
+	// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+	// 		}
+	// 	}
+	// }
+
+	// Non-parallel version
+	#pragma omp parallel for schedule(static)
+	for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+
+		// For U
+		F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+		// Reverse the order of matrix multiplication
+		F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
+
+		// For V
+		F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+		// Reverse the order of matrix multiplication
+		F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
 	}
+
+
+	printFullMatrix(dV, Nx, Ny);
+	std::cout << "Time to calculate reaction terms: " << Solver.format() << " seconds" << std::endl;
+
+
+
+
 
 }
+
+
+
+
 
 
 void ReactionDiffusion::writeToFile(){
@@ -296,6 +235,15 @@ void ReactionDiffusion::writeToFile(){
 	// Close the file
 	outfile.close();
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -318,5 +266,20 @@ void printBandedSymmetricMatrix(double* A, int N){
         }
         std::cout << std::endl;
     }
+
+}
+
+
+
+void GNUPlot(){
+	/* Need to run the following commands in the terminal:
+		set pm3d at st
+		set view map
+		set cbrange[0:1]
+		splot 'output.txt' using 1:2:3 w l palette
+	*/
+	
+	// Run the commands to the terminal 
+	system("gnome-terminal -e 'bash -c \"set pm3d at st; set view map; set cbrange[0:1]; splot \'output.txt\' using 1:2:3 w l palette; set term x11; set output; pause -1;\"'");
 
 }

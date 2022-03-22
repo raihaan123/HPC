@@ -51,7 +51,7 @@ int main(int argc, const char *argv[]){
     const double eps    = vm["eps"].as<double>();
 
 
-    std::cout << "Welcome to the Reaction-Diffusion Solver! Brace yourself for epic speeds..." << std::endl;
+    std::cout << "\nWelcome to the Reaction-Diffusion Solver! Brace yourself for epic speeds...\n" << std::endl;
 
 
     // Initializing the solver class
