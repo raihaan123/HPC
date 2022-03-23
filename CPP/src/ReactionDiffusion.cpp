@@ -29,10 +29,10 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	this->T = T;
 	this->Nx = Nx;
 	this->Ny = Ny;
-	this->a = 1/a;
+	this->a = 1/a;			  // a := 1/a to reduce overhead in the solver loops
 	this->b = b;
-	this->mu1 = mu1 * dt;       // mu1 is multiplied by dt to avoid repeated multiplication in the code
-	this->mu2 = mu2 * dt;       // mu2 is multiplied by dt to avoid repeated multiplication in the code
+	this->mu1 = mu1*dt;       // mu1 is multiplied by dt to avoid repeated multiplication in the code
+	this->mu2 = mu2*dt;       // mu2 is multiplied by dt to avoid repeated multiplication in the code
 	this->eps = eps;
 
 	// Allocate memory for U and V
@@ -44,24 +44,16 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	dV = new double[Nx*Ny];
 
     // Allocate memory for f1 and f2
-    f1 = new double[Nx*Ny];
-    f2 = new double[Nx*Ny];
+    // f1 = new double[Nx*Ny];
+    // f2 = new double[Nx*Ny];
 
 }
 
 
-// Set the initial conditions
+
 void ReactionDiffusion::setInitialConditions(){
-	/* 
-	Set the initial conditions to U and V
-	-------------------------------------
 
-	--> For y>ly/2, U = 1, 0 everywhere else
-	--> For x<lx/2, V = a/2, 0 everywhere else
-
-	*/
-
-	// Lx and Ly are always integers - Nx and Ny are odd integers
+	/// Lx and Ly are always integers - Nx and Ny are odd integers
 	const int Ly = (Ny-1)*dx;
 	const int Lx = (Nx-1)*dx;
 
@@ -81,7 +73,7 @@ void ReactionDiffusion::setInitialConditions(){
 			}
 
 			if (col < col_bound){
-				V[row*Ny + col] = 1/(2*a);			// Note that a has been inverted previously
+				V[row*Ny + col] = 1/(2*a);			// Note that a has been inverted previously!
 			}
 		}
 	}
@@ -93,7 +85,7 @@ void ReactionDiffusion::setInitialConditions(){
 
 double ReactionDiffusion::solve_f1(double& u, double& v){
 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
-	return dt * eps * u * (1.0 - u) * (u - (v + b)*a);
+	return dt * eps * u * (1.0-u) * (u-(v+b)*a);
 }
 
 
@@ -103,15 +95,13 @@ double ReactionDiffusion::solve_f2(double& u, double& v){
 }
 
 
-void ReactionDiffusion::solve()
+void ReactionDiffusion::TimeIntegrate()
 {
 	boost::timer::cpu_timer Solver;
 
 	for (double t = dt; t <= T; t += dt){
 
-        // OpenMP parallelisation - each thread solves a different part of the grid - use tasks
-
-        // Solve the diffusion equation - iterate over all interior nodes
+        // Uses OpenMP parallelisation - each thread solves a different part of the grid
 
         // Top left corner
         dU[0] = -2.0*U[0] + U[1] + U[Nx];
@@ -170,27 +160,13 @@ void ReactionDiffusion::solve()
         // Update the U and V values
         #pragma omp parallel for 
         for (int node = 0; node < Nx*Ny; ++node){
-            // U[node] += mu1*dU[node] + f1[node];
-            // V[node] += mu2*dV[node] + f2[node];
 			U[node] += mu1*dU[node] + solve_f1(U[node], V[node]);
 			V[node] += mu2*dV[node] + solve_f2(U[node], V[node]);
         }
-
-        // std::cout << "Simulation time: " << t << std::endl;
     }
-
-
-
-
-
-
-
-	
 	std::cout << "Time to solve: " << Solver.format() << " seconds" << std::endl;
 
 }
-
-
 
 void ReactionDiffusion::writeToFile(){
 	std::ofstream outfile;

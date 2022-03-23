@@ -17,6 +17,7 @@ int main(int argc, const char *argv[]){
     po::options_description opts("Allowed options");
     opts.add_options()
         ("help", "produce help message")
+        ("threads", po::value<int>()->default_value(16), "Run the solver with specified number of threads.")
         ("dt", po::value<double>()->default_value(0.001), "Time-step to use.")
         ("T", po::value<double>()->default_value(100.0), "Total integration time.")
         ("Nx", po::value<int>()->default_value(101), "Number of grid points in x.")
@@ -28,7 +29,7 @@ int main(int argc, const char *argv[]){
         ("eps", po::value<double>()->default_value(50.0), "Value of parameter epsilon.");
 
     // Default input for execution will look like:
-    // ./main --dt 0.001 --T 10.0 --Nx 101 --Ny 101 --a 0.75 --b 0.06 --mu1 5.0 --mu2 0.0 --eps 50.0
+    // ./main --threads 16 --dt 0.001 --T 10.0 --Nx 101 --Ny 101 --a 0.75 --b 0.06 --mu1 5.0 --mu2 0.0 --eps 50.0
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, opts), vm);
@@ -50,6 +51,9 @@ int main(int argc, const char *argv[]){
     const double mu2    = vm["mu2"].as<double>();
     const double eps    = vm["eps"].as<double>();
 
+    // Set the number of threads
+    omp_set_num_threads(vm["threads"].as<int>());
+
 
     std::cout << "\nWelcome to the Reaction-Diffusion Solver! Brace yourself for epic speeds...\n" << std::endl;
 
@@ -64,14 +68,13 @@ int main(int argc, const char *argv[]){
     myAwesomeSolver.setInitialConditions();
 
     // Solving the PDEs!
-    myAwesomeSolver.solve();
-    // myAwesomeSolver.openmp_fun();
+    myAwesomeSolver.TimeIntegrate();
 
     // Writing the solution to output.txt
     myAwesomeSolver.writeToFile();
 
 
-    std::cout << "Bye!" << std::endl;
+    std::cout << "\nBye!" << std::endl;
 
     return 0;
 
