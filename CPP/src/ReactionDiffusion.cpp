@@ -16,9 +16,9 @@ ReactionDiffusion::ReactionDiffusion(){
 ReactionDiffusion::~ReactionDiffusion(){
 	std::cout << "\nDestructing ReactionDiffusion object..." << std::endl;
 
-	// Free memory
-	delete[] U;
-	delete[] V;
+	// // Free memory
+	// delete[] U;
+	// delete[] V;
 }
 
 
@@ -29,7 +29,7 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	this->T = T;
 	this->Nx = Nx;
 	this->Ny = Ny;
-	this->a = a;
+	this->a = 1/a;
 	this->b = b;
 	this->mu1 = mu1 * dt;       // mu1 is multiplied by dt to avoid repeated multiplication in the code
 	this->mu2 = mu2 * dt;       // mu2 is multiplied by dt to avoid repeated multiplication in the code
@@ -43,9 +43,9 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	dU = new double[Nx*Ny];
 	dV = new double[Nx*Ny];
 
-    // // Allocate memory for f1 and f2
-    // f1 = new double[Nx*Ny];
-    // f2 = new double[Nx*Ny];
+    // Allocate memory for f1 and f2
+    f1 = new double[Nx*Ny];
+    f2 = new double[Nx*Ny];
 
 }
 
@@ -93,35 +93,13 @@ void ReactionDiffusion::setInitialConditions(){
 
 double ReactionDiffusion::solve_f1(double& u, double& v){
 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
-	return eps * u * (1.0 - u) * (u - (v + b)/a);
+	return eps * u * (1.0 - u) * (u - (v + b)*a);
 }
 
 
 double ReactionDiffusion::solve_f2(double& u, double& v){
 	// return u * u * u - v;
 	return u * u * u - v;
-}
-
-
-void ReactionDiffusion::openmp_fun(){
-
-	int nthreads, thread_id;
-
-	#pragma omp parallel private(thread_id)
-	{
-		thread_id = omp_get_thread_num();
-
-		#pragma omp master
-		{
-			nthreads = omp_get_num_threads();
-			std::cout << "Number of threads = " << nthreads << std::endl;
-		}
-
-		// each thread prints its ID
-		#pragma omp critical
-		std::cout << "Hello World from thread " << thread_id << std::endl;
-	}
-
 }
 
 
@@ -135,6 +113,22 @@ void ReactionDiffusion::solve()
 
         // Solve the diffusion equation - iterate over all interior nodes
 
+        // Top left corner
+        dU[0] = -2.0*U[0] + U[1] + U[Nx];
+        dV[0] = -2.0*V[0] + V[1] + V[Nx];
+
+        // Top edge
+        // #pragma omp parallel for
+        for (int col = 1; col < Nx-1; ++col){
+            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col+Nx];
+            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col+Nx];
+        }
+
+        // Top right corner
+        dU[Nx-1] = -2.0*U[Nx-1] + U[Nx-2] + U[Nx*2-1];
+        dV[Nx-1] = -2.0*V[Nx-1] + V[Nx-2] + V[Nx*2-1];
+
+
         #pragma omp parallel for
         for (int row = 1; row < Ny-1; ++row){
             #pragma omp parallel for
@@ -145,24 +139,6 @@ void ReactionDiffusion::solve()
                 dV[inner_node] = -4.0*V[inner_node] + V[inner_node-1] + V[inner_node+1] + V[inner_node-Ny] + V[inner_node+Ny];
             }
         }
-        
-        // Apply the boundary conditions to all edges and corners
-        // ------------------------------------------------------         
-
-        // Top edge
-        #pragma omp parallel for
-        for (int col = 1; col < Nx-1; ++col){
-            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col+Ny];
-            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col+Ny];
-        }
-
-        // Bottom edge
-        #pragma omp parallel for
-        for (int col = (Ny-1)*Nx+1; col < Ny*Nx-1; ++col){
-            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col-Ny];
-            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col-Ny];
-        }
-
 
         // Left and right edges - memory is non-contiguous - U and V are row-major, so can solve both edges in parallel
         #pragma omp parallel for
@@ -175,38 +151,36 @@ void ReactionDiffusion::solve()
         }
 
 
-        // Top left corner
-        dU[0] = -2.0*U[0] + U[1] + U[Ny];
-        dV[0] = -2.0*V[0] + V[1] + V[Ny];
-
-
-        // Top right corner
-        dU[Nx-1] = -2.0*U[Nx-1] + U[Nx-2] + U[Nx+Ny-1];
-        dV[Nx-1] = -2.0*V[Nx-1] + V[Nx-2] + V[Nx+Ny-1];
-
-
         // Bottom left corner
         dU[Nx*(Ny-1)] = -2.0*U[Nx*(Ny-1)] + U[Nx*(Ny-1)+1] + U[Nx*(Ny-2)];
         dV[Nx*(Ny-1)] = -2.0*V[Nx*(Ny-1)] + V[Nx*(Ny-1)+1] + V[Nx*(Ny-2)];
 
+        // Bottom edge
+        // #pragma omp parallel for
+        for (int col = (Ny-1)*Nx+1; col < Ny*Nx-1; ++col){
+            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col-Ny];
+            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col-Ny];
+        }
 
         // Bottom right corner
         dU[Nx*Ny-1] = -2.0*U[Nx*Ny-1] + U[Nx*Ny-2] + U[Nx*(Ny-1)-1];
         dV[Nx*Ny-1] = -2.0*V[Nx*Ny-1] + V[Nx*Ny-2] + V[Nx*(Ny-1)-1];
 
 
-        // // Solve f1 and f2 for each node
+        // Solve f1 and f2 for each node
         // #pragma omp parallel for
         // for (int node = 0; node < Nx*Ny; ++node){
-        //     f1[node] = solve_f1(U[node], V[node]);
-        //     f2[node] = solve_f2(U[node], V[node]);
+        //     f1[node] = dt * solve_f1(U[node], V[node]);
+        //     f2[node] = dt * solve_f2(U[node], V[node]);
         // }
 
         // Update the U and V values
-        #pragma omp parallel for
+        #pragma omp parallel for 
         for (int node = 0; node < Nx*Ny; ++node){
-            U[node] += mu1*dU[node] + dt*solve_f1(U[node], V[node]);
-            V[node] += mu2*dV[node] + dt*solve_f2(U[node], V[node]);
+            // U[node] += mu1*dU[node] + f1[node];
+            // V[node] += mu2*dV[node] + f2[node];
+			U[node] += mu1*dU[node] + dt * solve_f1(U[node], V[node]);
+			V[node] += mu2*dV[node] + dt * solve_f2(U[node], V[node]);
         }
 
         // std::cout << "Simulation time: " << t << std::endl;
