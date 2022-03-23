@@ -132,22 +132,22 @@ void ReactionDiffusion::solve()
         #pragma omp parallel for
         for (int row = 1; row < Ny-1; ++row){
             #pragma omp parallel for
-            for (int inner_node = row*Ny+1; inner_node < (row+1)*Nx-1; ++inner_node){
+            for (int inner_node = row*Nx+1; inner_node < (row+1)*Nx-1; ++inner_node){
 
                 // Apply the Laplacian stencil to the interior nodes
-                dU[inner_node] = -4.0*U[inner_node] + U[inner_node-1] + U[inner_node+1] + U[inner_node-Ny] + U[inner_node+Ny];
-                dV[inner_node] = -4.0*V[inner_node] + V[inner_node-1] + V[inner_node+1] + V[inner_node-Ny] + V[inner_node+Ny];
+                dU[inner_node] = -4.0*U[inner_node] + U[inner_node-1] + U[inner_node+1] + U[inner_node-Nx] + U[inner_node+Nx];
+                dV[inner_node] = -4.0*V[inner_node] + V[inner_node-1] + V[inner_node+1] + V[inner_node-Nx] + V[inner_node+Nx];
             }
         }
 
         // Left and right edges - memory is non-contiguous - U and V are row-major, so can solve both edges in parallel
         #pragma omp parallel for
         for (int row = 1; row < Ny-1; ++row){
-            dU[row*Ny] = -3.0*U[row*Ny] + U[(row+1)*Ny] + U[(row-1)*Ny] + U[row*Ny+1];     // Left edge
-            dV[row*Ny] = -3.0*V[row*Ny] + V[(row+1)*Ny] + V[(row-1)*Ny] + V[row*Ny+1];     // Left edge
+            dU[row*Nx] = -3.0*U[row*Nx] + U[(row+1)*Nx] + U[(row-1)*Nx] + U[row*Nx+1];     // Left edge
+            dV[row*Nx] = -3.0*V[row*Nx] + V[(row+1)*Nx] + V[(row-1)*Nx] + V[row*Nx+1];     // Left edge
 
-            dU[(row+1)*Ny-1] = -3.0*U[(row+1)*Ny-1] + U[(row+1)*Ny-2] + U[(row)*Ny-1] + U[(row+2)*Ny-1];     // Right edge
-            dV[(row+1)*Ny-1] = -3.0*V[(row+1)*Ny-1] + V[(row+1)*Ny-2] + V[(row)*Ny-1] + V[(row+2)*Ny-1];     // Right edge
+            dU[(row+1)*Nx-1] = -3.0*U[(row+1)*Nx-1] + U[(row+1)*Nx-2] + U[(row)*Nx-1] + U[(row+2)*Nx-1];     // Right edge
+            dV[(row+1)*Nx-1] = -3.0*V[(row+1)*Nx-1] + V[(row+1)*Nx-2] + V[(row)*Nx-1] + V[(row+2)*Nx-1];     // Right edge
         }
 
 
