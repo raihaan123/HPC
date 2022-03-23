@@ -16,9 +16,9 @@ ReactionDiffusion::ReactionDiffusion(){
 ReactionDiffusion::~ReactionDiffusion(){
 	std::cout << "\nDestructing ReactionDiffusion object..." << std::endl;
 
-	// // Free memory
-	// delete[] U;
-	// delete[] V;
+	// Free memory
+	delete[] U;
+	delete[] V;
 }
 
 
@@ -81,7 +81,7 @@ void ReactionDiffusion::setInitialConditions(){
 			}
 
 			if (col < col_bound){
-				V[row*Ny + col] = a/2.0;
+				V[row*Ny + col] = 1/(2*a);			// Note that a has been inverted previously
 			}
 		}
 	}
@@ -93,13 +93,13 @@ void ReactionDiffusion::setInitialConditions(){
 
 double ReactionDiffusion::solve_f1(double& u, double& v){
 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
-	return eps * u * (1.0 - u) * (u - (v + b)*a);
+	return dt * eps * u * (1.0 - u) * (u - (v + b)*a);
 }
 
 
 double ReactionDiffusion::solve_f2(double& u, double& v){
 	// return u * u * u - v;
-	return u * u * u - v;
+	return dt * (u * u * u - v);
 }
 
 
@@ -167,20 +167,13 @@ void ReactionDiffusion::solve()
         dV[Nx*Ny-1] = -2.0*V[Nx*Ny-1] + V[Nx*Ny-2] + V[Nx*(Ny-1)-1];
 
 
-        // Solve f1 and f2 for each node
-        // #pragma omp parallel for
-        // for (int node = 0; node < Nx*Ny; ++node){
-        //     f1[node] = dt * solve_f1(U[node], V[node]);
-        //     f2[node] = dt * solve_f2(U[node], V[node]);
-        // }
-
         // Update the U and V values
         #pragma omp parallel for 
         for (int node = 0; node < Nx*Ny; ++node){
             // U[node] += mu1*dU[node] + f1[node];
             // V[node] += mu2*dV[node] + f2[node];
-			U[node] += mu1*dU[node] + dt * solve_f1(U[node], V[node]);
-			V[node] += mu2*dV[node] + dt * solve_f2(U[node], V[node]);
+			U[node] += mu1*dU[node] + solve_f1(U[node], V[node]);
+			V[node] += mu2*dV[node] + solve_f2(U[node], V[node]);
         }
 
         // std::cout << "Simulation time: " << t << std::endl;
