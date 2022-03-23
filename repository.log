@@ -1,0 +1,667 @@
+commit 6dfe9a8e7b03ec19b76f54964961e5b687b52f14
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 23 21:08:40 2022 +0000
+
+    doxygen
+
+M	CPP/docs/Doxyfile
+
+commit 783e9d2d66d9eae30ffc7e5423301d217afa9e5e
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 23 20:34:47 2022 +0000
+
+    Generated docs!
+
+A	CPP/docs/Doxyfile
+A	CPP/docs/html/ReactionDiffusion_8cpp.html
+A	CPP/docs/html/ReactionDiffusion_8cpp__incl.dot
+A	CPP/docs/html/ReactionDiffusion_8h.html
+A	CPP/docs/html/ReactionDiffusion_8h__dep__incl.dot
+A	CPP/docs/html/ReactionDiffusion_8h_source.html
+A	CPP/docs/html/annotated.html
+A	CPP/docs/html/bc_s.png
+A	CPP/docs/html/bdwn.png
+A	CPP/docs/html/classReactionDiffusion-members.html
+A	CPP/docs/html/classReactionDiffusion.html
+A	CPP/docs/html/classes.html
+A	CPP/docs/html/closed.png
+A	CPP/docs/html/doc.png
+A	CPP/docs/html/doxygen.css
+A	CPP/docs/html/doxygen.png
+A	CPP/docs/html/dynsections.js
+A	CPP/docs/html/files.html
+A	CPP/docs/html/folderclosed.png
+A	CPP/docs/html/folderopen.png
+A	CPP/docs/html/functions.html
+A	CPP/docs/html/functions_func.html
+A	CPP/docs/html/globals.html
+A	CPP/docs/html/globals_defs.html
+A	CPP/docs/html/globals_func.html
+A	CPP/docs/html/graph_legend.dot
+A	CPP/docs/html/graph_legend.html
+A	CPP/docs/html/index.html
+A	CPP/docs/html/jquery.js
+A	CPP/docs/html/main_8cpp.html
+A	CPP/docs/html/main_8cpp__incl.dot
+A	CPP/docs/html/menu.js
+A	CPP/docs/html/menudata.js
+A	CPP/docs/html/nav_f.png
+A	CPP/docs/html/nav_g.png
+A	CPP/docs/html/nav_h.png
+A	CPP/docs/html/open.png
+A	CPP/docs/html/output_8txt.html
+A	CPP/docs/html/search/all_0.html
+A	CPP/docs/html/search/all_0.js
+A	CPP/docs/html/search/all_1.html
+A	CPP/docs/html/search/all_1.js
+A	CPP/docs/html/search/all_2.html
+A	CPP/docs/html/search/all_2.js
+A	CPP/docs/html/search/all_3.html
+A	CPP/docs/html/search/all_3.js
+A	CPP/docs/html/search/all_4.html
+A	CPP/docs/html/search/all_4.js
+A	CPP/docs/html/search/all_5.html
+A	CPP/docs/html/search/all_5.js
+A	CPP/docs/html/search/all_6.html
+A	CPP/docs/html/search/all_6.js
+A	CPP/docs/html/search/all_7.html
+A	CPP/docs/html/search/all_7.js
+A	CPP/docs/html/search/all_8.html
+A	CPP/docs/html/search/all_8.js
+A	CPP/docs/html/search/all_9.html
+A	CPP/docs/html/search/all_9.js
+A	CPP/docs/html/search/classes_0.html
+A	CPP/docs/html/search/classes_0.js
+A	CPP/docs/html/search/close.png
+A	CPP/docs/html/search/defines_0.html
+A	CPP/docs/html/search/defines_0.js
+A	CPP/docs/html/search/files_0.html
+A	CPP/docs/html/search/files_0.js
+A	CPP/docs/html/search/files_1.html
+A	CPP/docs/html/search/files_1.js
+A	CPP/docs/html/search/files_2.html
+A	CPP/docs/html/search/files_2.js
+A	CPP/docs/html/search/functions_0.html
+A	CPP/docs/html/search/functions_0.js
+A	CPP/docs/html/search/functions_1.html
+A	CPP/docs/html/search/functions_1.js
+A	CPP/docs/html/search/functions_2.html
+A	CPP/docs/html/search/functions_2.js
+A	CPP/docs/html/search/functions_3.html
+A	CPP/docs/html/search/functions_3.js
+A	CPP/docs/html/search/functions_4.html
+A	CPP/docs/html/search/functions_4.js
+A	CPP/docs/html/search/functions_5.html
+A	CPP/docs/html/search/functions_5.js
+A	CPP/docs/html/search/functions_6.html
+A	CPP/docs/html/search/functions_6.js
+A	CPP/docs/html/search/functions_7.html
+A	CPP/docs/html/search/functions_7.js
+A	CPP/docs/html/search/mag_sel.png
+A	CPP/docs/html/search/nomatches.html
+A	CPP/docs/html/search/search.css
+A	CPP/docs/html/search/search.js
+A	CPP/docs/html/search/search_l.png
+A	CPP/docs/html/search/search_m.png
+A	CPP/docs/html/search/search_r.png
+A	CPP/docs/html/search/searchdata.js
+A	CPP/docs/html/splitbar.png
+A	CPP/docs/html/sync_off.png
+A	CPP/docs/html/sync_on.png
+A	CPP/docs/html/tab_a.png
+A	CPP/docs/html/tab_b.png
+A	CPP/docs/html/tab_h.png
+A	CPP/docs/html/tab_s.png
+A	CPP/docs/html/tabs.css
+A	CPP/docs/latex/Makefile
+A	CPP/docs/latex/ReactionDiffusion_8cpp.tex
+A	CPP/docs/latex/ReactionDiffusion_8cpp__incl.dot
+A	CPP/docs/latex/ReactionDiffusion_8h.tex
+A	CPP/docs/latex/ReactionDiffusion_8h__dep__incl.dot
+A	CPP/docs/latex/annotated.tex
+A	CPP/docs/latex/classReactionDiffusion.tex
+A	CPP/docs/latex/doxygen.sty
+A	CPP/docs/latex/files.tex
+A	CPP/docs/latex/longtable_doxygen.sty
+A	CPP/docs/latex/main_8cpp.tex
+A	CPP/docs/latex/main_8cpp.tex.tmp
+A	CPP/docs/latex/main_8cpp__incl.dot
+A	CPP/docs/latex/output_8txt.tex
+A	CPP/docs/latex/refman.tex
+A	CPP/docs/latex/tabu_doxygen.sty
+
+commit e9cb51872683112dae351417080497acba067299
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 20:29:17 2022 +0000
+
+    Slightly more cleaning
+
+M	CPP/src/Plotter.ipynb
+D	CPP/src/ReactionDiffusion.o
+D	CPP/src/main
+D	CPP/src/main.o
+M	README.md
+
+commit ad27baea57d1c7b137015dd489a9015f74b03057
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 20:23:08 2022 +0000
+
+    More reorganisation
+
+D	CPP/CMakeLists.txt
+R100	CPP/src/archived/Archive.txt	CPP/archived/Archive.txt
+R100	CPP/src/archived/ForwardEuler.cpp	CPP/archived/ForwardEuler.cpp
+R100	CPP/src/archived/ForwardEuler.h	CPP/archived/ForwardEuler.h
+R100	CPP/src/archived/ReactionDiffusion.cpp	CPP/archived/ReactionDiffusion.cpp
+R100	CPP/src/archived/ReactionDiffusion.h	CPP/archived/ReactionDiffusion.h
+R100	CPP/src/archived/ReactionDiffusion.o	CPP/archived/ReactionDiffusion.o
+R100	CPP/src/initial.er/archives/ld-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/ld-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libc-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libc-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libcollector.so_kN_xj2QRtH5	CPP/profiler/initial.er/archives/libcollector.so_kN_xj2QRtH5
+R100	CPP/src/initial.er/archives/libdl-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libdl-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libgcc_s.so.1_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libgcc_s.so.1_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libm-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libm-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libpthread-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libpthread-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/librt-2.31.so_dnWuQRcLhw9	CPP/profiler/initial.er/archives/librt-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9	CPP/profiler/initial.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9
+R100	CPP/src/initial.er/archives/main_VFTAuc075i5	CPP/profiler/initial.er/archives/main_VFTAuc075i5
+R100	CPP/src/initial.er/data.frameinfo	CPP/profiler/initial.er/data.frameinfo
+R100	CPP/src/initial.er/dyntext	CPP/profiler/initial.er/dyntext
+R100	CPP/src/initial.er/er_archive.log	CPP/profiler/initial.er/er_archive.log
+R100	CPP/src/initial.er/jclasses	CPP/profiler/initial.er/jclasses
+R100	CPP/src/initial.er/log.xml	CPP/profiler/initial.er/log.xml
+R100	CPP/src/initial.er/map.xml	CPP/profiler/initial.er/map.xml
+R100	CPP/src/initial.er/overview	CPP/profiler/initial.er/overview
+R100	CPP/src/initial.er/profile	CPP/profiler/initial.er/profile
+R100	CPP/src/solution.ipynb	CPP/src/Plotter.ipynb
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+M	CPP/src/output.txt
+D	CPP/src/repository.log
+M	README.md
+D	ordering memory.md
+
+commit 69bc32bb26bf2c44bc970c6116e227908165b8cc
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 20:07:36 2022 +0000
+
+    Cleaned up
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/ReactionDiffusion.o
+R100	CPP/src/initial1.er/archives/ld-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/ld-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9	CPP/src/initial.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9	CPP/src/initial.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9	CPP/src/initial.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libc-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/libc-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libcollector.so_kN_xj2QRtH5	CPP/src/initial.er/archives/libcollector.so_kN_xj2QRtH5
+R100	CPP/src/initial1.er/archives/libdl-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/libdl-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libgcc_s.so.1_dnWuQRcLhw9	CPP/src/initial.er/archives/libgcc_s.so.1_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9	CPP/src/initial.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libm-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/libm-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libpthread-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/libpthread-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/librt-2.31.so_dnWuQRcLhw9	CPP/src/initial.er/archives/librt-2.31.so_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9	CPP/src/initial.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9
+R100	CPP/src/initial1.er/archives/main_VFTAuc075i5	CPP/src/initial.er/archives/main_VFTAuc075i5
+R100	CPP/src/initial1.er/data.frameinfo	CPP/src/initial.er/data.frameinfo
+R100	CPP/src/initial1.er/dyntext	CPP/src/initial.er/dyntext
+R100	CPP/src/initial1.er/er_archive.log	CPP/src/initial.er/er_archive.log
+R100	CPP/src/initial1.er/jclasses	CPP/src/initial.er/jclasses
+R100	CPP/src/initial1.er/log.xml	CPP/src/initial.er/log.xml
+R100	CPP/src/initial1.er/map.xml	CPP/src/initial.er/map.xml
+R100	CPP/src/initial1.er/overview	CPP/src/initial.er/overview
+R100	CPP/src/initial1.er/profile	CPP/src/initial.er/profile
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+A	CPP/src/repository.log
+
+commit 1d3cb764d5bfb2c6251bb6cff8c99d05113f8d39
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 15:40:40 2022 +0000
+
+    Fixed Task 4 - 2.65s, 16 threads
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/output.txt
+
+commit 0b0e3ba4c75377c5ca7604d607bcfa4261a0b742
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 15:25:47 2022 +0000
+
+    Test 2 - 5.69s! Using 16 threads
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/output.txt
+
+commit 61d1d7d096817a12d60e5f76d669b27d7753a85d
+Merge: f3cbb21 bbdc980
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 23 13:32:52 2022 +0000
+
+    Merge pull request #3 from raihaan123/CPP
+    
+    Merging branch CPP into master
+
+commit bbdc980718c9917ce985deb05e60132cd4a1b465
+Author: Raihaan Usman <ru19@spitfire.ae.ic.ac.uk>
+Date:   Wed Mar 23 13:30:05 2022 +0000
+
+    Speeeeed! 8.36s for test 2
+
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/output.txt
+
+commit 42ae0e749c74145c536ae5e359fe9dc657c749d9
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Wed Mar 23 09:44:24 2022 +0000
+
+    New for loop solution started, decent performance
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/ReactionDiffusion.o
+R100	CPP/src/Archive.txt	CPP/src/archived/Archive.txt
+R100	CPP/src/ForwardEuler.cpp	CPP/src/archived/ForwardEuler.cpp
+R100	CPP/src/ForwardEuler.h	CPP/src/archived/ForwardEuler.h
+A	CPP/src/archived/ReactionDiffusion.cpp
+A	CPP/src/archived/ReactionDiffusion.h
+A	CPP/src/archived/ReactionDiffusion.o
+A	CPP/src/initial1.er/archives/ld-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libc-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libcollector.so_kN_xj2QRtH5
+A	CPP/src/initial1.er/archives/libdl-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libgcc_s.so.1_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libm-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libpthread-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/librt-2.31.so_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9
+A	CPP/src/initial1.er/archives/main_VFTAuc075i5
+A	CPP/src/initial1.er/data.frameinfo
+A	CPP/src/initial1.er/dyntext
+A	CPP/src/initial1.er/er_archive.log
+A	CPP/src/initial1.er/jclasses
+A	CPP/src/initial1.er/log.xml
+A	CPP/src/initial1.er/map.xml
+A	CPP/src/initial1.er/overview
+A	CPP/src/initial1.er/profile
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+M	CPP/src/output.txt
+
+commit 8faed4cb69b488b16e19973c2aaccc17f049f403
+Author: Raihaan Usman <ru19@typhoon.ae.ic.ac.uk>
+Date:   Tue Mar 22 19:50:21 2022 +0000
+
+    Scrapping everything vectorised
+
+M	CPP/src/Archive.txt
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+M	CPP/src/output.txt
+M	CPP/src/solution.ipynb
+
+commit 05747da1cebbcbe78fd29faaf7cd0635b37de966
+Author: Raihaan Usman <ru19@spitfire.ae.ic.ac.uk>
+Date:   Tue Mar 22 11:39:49 2022 +0000
+
+    More corruption ahaha
+
+M	CPP/src/solution.ipynb
+
+commit 23ae534b8b7f1bc2dfe83ef54a0fcf9717cc7f53
+Merge: 28211b0 e8e598e
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 22 11:37:15 2022 +0000
+
+    Merge branch 'CPP' of https://github.com/raihaan123/HPC into CPP
+
+commit e8e598ed93e7ce20c45ba4f66610b92b68921b5e
+Author: Raihaan Usman <ru19@spitfire.ae.ic.ac.uk>
+Date:   Tue Mar 22 11:36:44 2022 +0000
+
+    something got corrupted...
+
+M	CPP/src/solution.ipynb
+
+commit 28211b0f193b194b07fe6426ad45ddcf922d9e19
+Merge: 6217e73 41b2a00
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 22 11:34:49 2022 +0000
+
+    Merge branch 'CPP' of https://github.com/raihaan123/HPC into CPP
+
+commit 6217e73eabb1a4d9ab7a918ddfc5b3bda68cc494
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 22 11:34:26 2022 +0000
+
+    Modified solution plotter
+
+M	CPP/src/solution.ipynb
+
+commit 41b2a001ed9337ce0880a326540afe99d394ed02
+Author: Raihaan Usman <ru19@spitfire.ae.ic.ac.uk>
+Date:   Tue Mar 22 11:33:25 2022 +0000
+
+    New results
+
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/output.txt
+M	CPP/src/solution.ipynb
+
+commit a348bafd2e39525ed920ea8d6a5200be45e95ead
+Author: Raihaan Usman <ru19@spitfire.ae.ic.ac.uk>
+Date:   Tue Mar 22 02:18:47 2022 +0000
+
+    Non-optimised solver
+
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+A	CPP/src/output.txt
+A	CPP/src/solution.ipynb
+
+commit eff1958d2de29e612f985f8ebb0ab8204dc15615
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 22 00:43:50 2022 +0000
+
+    Cool method started - using the minimal A matrix
+
+M	CPP/src/Archive.txt
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	CPP/src/main.o
+A	ordering memory.md
+
+commit 8c4f299c382849440b97f923651869ea29988474
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Mon Mar 21 12:58:24 2022 +0000
+
+    Still debugging dsbmv_ and dgemv_
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/ReactionDiffusion.o
+M	CPP/src/main
+M	CPP/src/main.o
+
+commit 9a6cf4bbeb42a8b01575e4991293296d060b8241
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sun Mar 20 10:55:41 2022 +0000
+
+    Initial conditions work nicely
+
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+A	CPP/src/ReactionDiffusion.o
+A	CPP/src/main
+A	CPP/src/main.o
+
+commit f3cbb2179c03fcf930ac4d03d35a3fe49683dc10
+Merge: 8914320 85813b8
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sun Mar 20 09:19:20 2022 +0000
+
+    Merge branch 'master' of https://github.com/raihaan123/HPC
+
+commit 891432027db5358630079e6513fb3734b9ca3b27
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sun Mar 20 09:19:18 2022 +0000
+
+    Fixed a bug in initial conditions - (Nx-1)*dx/2
+
+M	Python/figs/final_solution_test_1.png
+M	Python/solution.ipynb
+
+commit f415ab4d32706d517792171f7f0162cb00063aae
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 19 23:57:28 2022 +0000
+
+    Working on initial conditions
+
+M	.vscode/settings.json
+M	CPP/src/Archive.txt
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+D	CPP/src/main
+M	CPP/src/main.cpp
+
+commit 6f969e0e4f6354119b076585da9460220edf6490
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 19 21:20:12 2022 +0000
+
+    OpenMP is really fun.
+
+A	CPP/src/ForwardEuler.cpp
+M	CPP/src/ForwardEuler.h
+M	CPP/src/Makefile
+M	CPP/src/ReactionDiffusion.cpp
+M	CPP/src/ReactionDiffusion.h
+M	CPP/src/main
+M	CPP/src/main.cpp
+M	Development Notes.md
+
+commit da70efeec70d414dfc836542ff25ef99d3d2a978
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Fri Mar 18 19:46:31 2022 +0000
+
+    Fiddling with makefile
+
+A	CPP/CMakeLists.txt
+D	CPP/ForwardEuler.h
+D	CPP/Makefile
+D	CPP/main
+D	CPP/main.o
+A	CPP/src/Archive.txt
+A	CPP/src/ForwardEuler.h
+A	CPP/src/Makefile
+R100	CPP/ReactionDiffusion.cpp	CPP/src/ReactionDiffusion.cpp
+R100	CPP/ReactionDiffusion.h	CPP/src/ReactionDiffusion.h
+A	CPP/src/main
+R083	CPP/main.cpp	CPP/src/main.cpp
+A	Development Notes.md
+
+commit 475a84c8dcfdaeed7ebcf5101a37b1e1979ba860
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Thu Mar 17 18:53:30 2022 +0000
+
+    Added cpp prototype files
+
+A	.vscode/settings.json
+A	CPP/ForwardEuler.h
+A	CPP/Makefile
+A	CPP/ReactionDiffusion.cpp
+A	CPP/ReactionDiffusion.h
+A	CPP/main
+A	CPP/main.cpp
+A	CPP/main.o
+
+commit 85813b8890c65c737957cd045cdfb12b8f077b39
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Thu Mar 17 09:24:09 2022 +0000
+
+    Create README.md
+
+A	README.md
+
+commit 3e118e0186461cc93375d23013a2be9e36f74b31
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 16 21:09:58 2022 +0000
+
+    Cleaning
+
+D	Python/__pycache__/solver.cpython-39.pyc
+
+commit 6fed8f77330bcf6f0ab28e72641c2a0902c64c11
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 16 19:45:16 2022 +0000
+
+    Saving outputs
+
+A	Python/figs/final_solution_test_1.png
+R100	Python/figs/final_solution.png	Python/figs/final_solution_test_2.png
+A	Python/figs/final_solution_test_3.png
+A	Python/figs/final_solution_test_4.png
+M	Python/solution.ipynb
+
+commit 42bbb61f1f278af6781e7117c8bef35e64388aa4
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Wed Mar 16 19:36:38 2022 +0000
+
+    Fixing Test 4 - Now supports non-square meshes
+
+M	Python/figs/final_solution.png
+M	Python/solution.ipynb
+
+commit 385462c953e5425d9b5d680d10f962205857b99e
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 15 17:08:44 2022 +0000
+
+    Formatting updates
+
+M	Python/solution.ipynb
+
+commit 529f12f2958d3d9a0829a243935ca2a715669c0c
+Merge: 0b2d075 d760e6c
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 15 16:59:59 2022 +0000
+
+    Merge pull request #2 from raihaan123/Python
+    
+    Python solution works
+
+commit d760e6cc0476755974d7129efb2620d455619bb6
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 15 16:58:09 2022 +0000
+
+    Fixed! Onto C++!
+
+R100	Python/main.py	Python/For_Loops.py
+D	Python/figs/0.999.png
+D	Python/figs/9.999.png
+D	Python/figs/Figure_1.png
+A	Python/figs/final_solution.png
+M	Python/solution.ipynb
+D	Python/solver.py
+
+commit adfd59f6d1ce1f1234bbf05e676c8f3f84dc1f5a
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 15 01:32:45 2022 +0000
+
+    Begin debugging yay
+
+M	Python/solution.ipynb
+
+commit f039b3c7124035d944bec26c7d493a08844e7381
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Tue Mar 15 00:41:29 2022 +0000
+
+    Updated solution method
+
+M	Python/__pycache__/solver.cpython-39.pyc
+A	Python/figs/0.999.png
+A	Python/figs/9.999.png
+A	Python/figs/Figure_1.png
+M	Python/main.py
+M	Python/solution.ipynb
+
+commit b1c15eface82543c77b3695afa9cfafaabb99df6
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 12 01:42:46 2022 +0000
+
+    Central differencing started
+
+M	Python/main.py
+M	Python/solution.ipynb
+M	Python/solver.py
+
+commit 0b2d075a6623d9f7f31fadd208eb34a058da5031
+Merge: 6f4edd7 1e715a5
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 12 00:56:39 2022 +0000
+
+    Merge pull request #1 from raihaan123:Python
+    
+    Merging progress
+
+commit 37239c997b31c1f7b7b7fe69e0bd597b738020d5
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 12 00:51:55 2022 +0000
+
+    Purged python
+
+D	main.py
+
+commit 1e715a57394b5342552316031400c7f8cb1349d5
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 12 00:50:34 2022 +0000
+
+    Fixed latex
+
+M	Python/solution.ipynb
+
+commit 30ff70228fc07a91e1a79c116da4bd88bb174468
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Sat Mar 12 00:42:51 2022 +0000
+
+    Added latex
+
+M	Python/solution.ipynb
+
+commit 88edcd6b9e029d992bec53370db8d9a0cb308575
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Fri Mar 11 23:59:29 2022 +0000
+
+    Started Python implementation - using Jupyter NB
+
+A	Python/__pycache__/solver.cpython-39.pyc
+R100	main.py	Python/main.py
+A	Python/solution.ipynb
+A	Python/solver.py
+
+commit 6f4edd7969669f6423e1918a1850e00d1c79c2f6
+Author: Raihaan Usman <raihaan.usman@gmail.com>
+Date:   Fri Mar 11 20:40:03 2022 +0000
+
+    first commit
+
+A	main.py
