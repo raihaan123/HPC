@@ -1,7 +1,7 @@
 # High Performance Computing 2022
 ### Raihaan Usman
 
-This is my coursework submission! To get started, head to the CPP directory and run `make run{i}` for the i'th test case.
+This is my coursework submission! To get started, head to the `CPP/src` directory and run `make run{i}` for the i'th test case.
 
 Alternatively for serial execution, run `make test{i}`.
 
