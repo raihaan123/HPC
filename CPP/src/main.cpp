@@ -12,8 +12,8 @@ namespace po = boost::program_options;
 
 
 int main(int argc, const char *argv[]){
+
     // Boost program options
-    
     po::options_description opts("Allowed options");
     opts.add_options()
         ("help", "produce help message")

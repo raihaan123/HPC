@@ -43,10 +43,6 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	dU = new double[Nx*Ny];
 	dV = new double[Nx*Ny];
 
-    // Allocate memory for f1 and f2
-    // f1 = new double[Nx*Ny];
-    // f2 = new double[Nx*Ny];
-
 }
 
 
@@ -66,6 +62,7 @@ void ReactionDiffusion::setInitialConditions(){
 	
 	// Set the initial conditions
 	boost::timer::cpu_timer InitialConditions;
+	double a_half = 1/(2*a);
 	for (int row = 0; row < Nx; ++row){
 		for (int col = 0; col < Ny; ++col){
 			if (row < row_bound){
@@ -73,7 +70,7 @@ void ReactionDiffusion::setInitialConditions(){
 			}
 
 			if (col < col_bound){
-				V[row*Ny + col] = 1/(2*a);			// Note that a has been inverted previously!
+				V[row*Ny + col] = a_half;			// Note that a has been inverted previously!
 			}
 		}
 	}
@@ -84,13 +81,13 @@ void ReactionDiffusion::setInitialConditions(){
 
 
 double ReactionDiffusion::solve_f1(double& u, double& v){
-	// return eps * u * (1.0 - u) * (u - (v + b)/a);
+	// f1 = eps * u * (1.0 - u) * (u - (v + b)/a) ---> Note that a has been inverted previously!
 	return dt * eps * u * (1.0-u) * (u-(v+b)*a);
 }
 
 
 double ReactionDiffusion::solve_f2(double& u, double& v){
-	// return u * u * u - v;
+	// f2 = u * u * u - v
 	return dt * (u * u * u - v);
 }
 
