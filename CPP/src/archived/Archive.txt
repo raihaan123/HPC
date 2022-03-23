@@ -1,0 +1,296 @@
+
+	// testing the matrix multiplication funnction void TwoByTwo(double* A, int lda, double* B, int ldb, double* C);
+	double* A = new double[4];
+	double* B = new double[4];
+	double* C = new double[4];
+
+	A[0] = 1.0;
+	A[1] = 2.0;
+	A[2] = 3.0;
+	A[3] = 4.0;
+
+	B[0] = 5.0;
+	B[1] = 6.0;
+	B[2] = 7.0;
+	B[3] = 8.0;
+
+	TwoByTwo(A, 2, B, 2, C);
+
+	std::cout << "A matrix:\n" << std::endl;
+	printFullMatrix(A, 2, 2);
+
+	std::cout << "B matrix:\n" << std::endl;
+	printFullMatrix(B, 2, 2);
+
+	std::cout << "C matrix:\n" << std::endl;
+	printFullMatrix(C, 2, 2);
+
+
+
+
+
+
+
+
+
+
+// // Print the input parameters
+// std::cout << "Input parameters:" << std::endl;
+// std::cout << "dt = " << dt << std::endl;
+// std::cout << "T = " << T << std::endl;
+// std::cout << "Nx = " << Nx << std::endl;
+// std::cout << "Ny = " << Ny << std::endl;
+// std::cout << "a = " << a << std::endl;
+// std::cout << "b = " << b << std::endl;
+// std::cout << "mu1 = " << mu1 << std::endl;
+// std::cout << "mu2 = " << mu2 << std::endl;
+// std::cout << "eps = " << eps << std::endl;
+
+// Some OpenMP fun!
+
+
+
+void ReactionDiffusion::openmp_fun(){
+
+	int nthreads, thread_id;
+
+	#pragma omp parallel private(thread_id)
+	{
+		thread_id = omp_get_thread_num();
+
+		#pragma omp master
+		{
+			nthreads = omp_get_num_threads();
+			std::cout << "Number of threads = " << nthreads << std::endl;
+		}
+
+		// each thread prints its ID
+		#pragma omp critical
+		std::cout << "Hello World from thread " << thread_id << std::endl;
+	}
+
+}
+
+
+
+
+TEMP HOLDING
+
+
+// // BLAS definitions
+// #define F77NAME(x) x##_
+
+// // Symmetric banded matrix A multiplication with a full matrix U - use dsbmv!
+// extern "C" {
+// 	void F77NAME(dsbmv)(const char *uplo, const int *n, const int *k,
+// 						const double *alpha, const double *A, const int& lda,
+// 						const double *x, const int& incx, const double& beta,
+// 						double *y, const int& incy);
+
+// 	void F77NAME(dgemm)(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+// 						const double *alpha, const double *A, const int *lda,
+// 						const double *B, const int *ldb, const double *beta,
+// 						double *C, const int *ldc);
+// }
+
+
+
+
+
+// A is a square symmetric banded matrix of size Ny x Ny - store in banded form - has -2 on the diagonal and -1 on the off-diagonal
+	double *A = new double[2*Ny];
+
+	// Full size A matrix
+	double *A_full = new double[Ny*Ny];
+
+	// Boost timer start
+	boost::timer::cpu_timer FillingMatrix;
+
+	/*
+	Populate the matrix A!
+	----------------------
+
+	First row is all 1s from 2 to Ny
+	Second row is -1 at start and finish, and -2 at the middle
+
+	*/
+
+	// Superdiagonal
+	A[0] = 0.0;
+	for (int col = 1; col < Ny; col++){
+		A[col] = 1.0;
+	}
+	
+	// Main diagonal
+	for (int col = 0; col < Ny-1; col++){
+		A[Ny + col] = -2.0;
+	}
+
+	// Neumann boundary conditions
+	A[Ny] = -1.0;
+	A[Ny*2 - 1] = -1.0;
+
+	// End timer
+	std::cout << "Time to set A: " << FillingMatrix.format() << " seconds" << std::endl;
+
+    // Print the A matrix (nicely formatted!)
+	// std::cout << "A matrix:" << std::endl;
+    // printBandedSymmetricMatrix(A, Ny);
+
+	// A_full is the full matrix A - main diagonal is all -2s and 1st super diagonal is all 1s - all else 0 - symmetric
+	boost::timer::cpu_timer FillingMatrix2;
+
+	for (int row = 0; row < Ny; row++){
+		for (int col = 0; col < Ny; col++){
+			if (row == col){
+				A_full[row*Ny + col] = -2.0;
+			}
+			else if (row == col - 1 || row == col + 1){
+				A_full[row*Ny + col] = 1.0;
+			}
+			else{
+				A_full[row*Ny + col] = 0.0;
+			}
+		}
+	}
+
+	// Neumann boundary conditions
+	A_full[0] = -1.0;
+	A_full[Ny*Ny-1] = -1.0;
+
+	// End timer
+	std::cout << "Time to set A_full: " << FillingMatrix2.format() << " seconds" << std::endl;
+
+	// Print the A_full matrix
+	// std::cout << "A_full matrix:" << std::endl;
+	// printFullMatrix(A_full, Ny, Ny);
+
+
+
+SOLVER
+
+
+
+
+    void ReactionDiffusion::solve(){
+	std::cout << "\nCalled solver!" << std::endl;
+
+	// Allocate memory for dU and dV
+	dU = new double[Nx*Ny];
+	dV = new double[Nx*Ny];
+
+	// for loop from 0 to T in steps of dt
+	for (int t = 0; t <= T; t += dt){
+
+		// Evaluate the reaction terms - methods with save results in dU and dV
+		f1();
+		f2();
+
+		// mu1*(A*U + U*A) + f1
+		// mu2*(A*V + V*A) + f2
+
+		// k is the number of super-diagonals in the matrix A
+		// const int k = 1;
+
+		// Using cblas_dsbmv for one row of U at a time (not the whole matrix) - using a for loop
+		// for (int row = 0; row < Nx; ++row){
+
+		// 	// Note that beta = 1 because we are adding to dU (f1 is already in dU)
+		// 	// cblas_dsbmv(CblasRowMajor, CblasUpper, Ny, k, mu1, A_full, Ny, U, 1, 1.0, dU, 1);
+		// 	// F77NAME(dsbmv)("U", &Ny, &k, &mu1, A_full, Ny, &U[row*Ny], 1, 1.0, &dU[row*Ny], 1);
+		// 	// cblas_dgemv(CblasRowMajor, CblasNoTrans, Ny, k, mu1, A_full, Ny, &U[row*Ny], 1, 1.0, &dU[row*Ny], 1);
+		// 	// try dgemm
+		// 	// 
+		// 	std::cout << "survived dsbmv" << std::endl;
+
+		// 	// same for v
+		// 	cblas_dgemv(CblasRowMajor, CblasNoTrans, Ny, k, mu2, A_full, Ny, &V[row*Ny], 1, 1, &dV[row*Ny], 1);
+		
+		// }
+
+		// Update U
+		for (int row = 0; row < Nx; ++row){
+			for (int col = 0; col < Ny; ++col){
+				U[row*Ny + col] += dt * dU[row*Ny + col];
+			}
+		}
+		std::cout << "Survived U update" << std::endl;
+
+		// Update V
+		for (int row = 0; row < Nx; ++row){
+			for (int col = 0; col < Ny; ++col){
+				V[row*Ny + col] += dt * dV[row*Ny + col];
+			}
+		}
+		std::cout << "Survived V update" << std::endl;
+	}
+	
+	// Print the solution
+	std::cout << "U matrix (Solution):\n" << std::endl;
+	printFullMatrix(U, Nx, Ny);
+}
+
+
+
+
+
+
+
+	// Testing cblas_dgemm - product of two matrices A and 2x2 subset of 5x5 identity matrix I
+	I = new double[5*5];
+	C = new double[2*2];
+
+	for (int i = 0; i < 5*5; ++i){
+		I[i] = 0.0;
+	}
+
+	for (int i = 0; i < 2*2; ++i){
+		C[i] = 0.0;
+	}
+
+	for (int i = 0; i < 5; ++i){
+		I[i*5 + i] = 1.0;
+	}
+
+	// A already allocated - A * I, but only the top right 2x2 subset of I
+
+	F77NAME(dgemm)("N", "N", 2, 2, 2, 1, A, 2, I+5, 5, 0, C, 2);
+
+	printFullMatrix(C, 2, 2);
+
+
+
+
+
+
+
+
+
+
+
+				// Calculate the Laplacian terms - multiplication of the fundamental shift matrix with the U and V sub-matrices - allocated to several threads
+		//  #pragma omp parallel
+		//  {
+		//  	#pragma omp single
+		//  	{
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		// 			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Ny, 1.0, &dU[cell], Ny);
+		// 		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Ny, A, 2, 1.0, &dU[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Ny, 1.0, &dV[cell], Ny);
+		//  		}
+
+		//  		#pragma omp task
+		//  		for (int cell = 0; cell < (Nx-1)*(Ny-1); ++cell){
+		//  			F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Ny, A, 2, 1.0, &dV[cell], Ny);
+		//  		}
+		//  	}
+		//  }
