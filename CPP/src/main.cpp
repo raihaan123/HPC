@@ -17,15 +17,15 @@ int main(int argc, const char *argv[]){
     po::options_description opts("Allowed options");
     opts.add_options()
         ("help", "produce help message")
-        ("dt", po::value<double>()->default_value(0.01), "Time-step to use.")
-        ("T", po::value<double>()->default_value(1.0), "Total integration time.")
-        ("Nx", po::value<int>()->default_value(100), "Number of grid points in x.")
-        ("Ny", po::value<int>()->default_value(100), "Number of grid points in y.")
-        ("a", po::value<double>()->default_value(1.0), "Value of parameter a.")
-        ("b", po::value<double>()->default_value(1.0), "Value of parameter b.")
-        ("mu1", po::value<double>()->default_value(1.0), "Value of parameter mu1.")
-        ("mu2", po::value<double>()->default_value(1.0), "Value of parameter mu2.")
-        ("eps", po::value<double>()->default_value(1.0), "Value of parameter epsilon.");
+        ("dt", po::value<double>()->default_value(0.001), "Time-step to use.")
+        ("T", po::value<double>()->default_value(100.0), "Total integration time.")
+        ("Nx", po::value<int>()->default_value(101), "Number of grid points in x.")
+        ("Ny", po::value<int>()->default_value(101), "Number of grid points in y.")
+        ("a", po::value<double>()->default_value(0.75), "Value of parameter a.")
+        ("b", po::value<double>()->default_value(0.06), "Value of parameter b.")
+        ("mu1", po::value<double>()->default_value(5.0), "Value of parameter mu1.")
+        ("mu2", po::value<double>()->default_value(0.0), "Value of parameter mu2.")
+        ("eps", po::value<double>()->default_value(50.0), "Value of parameter epsilon.");
 
     // Default input for execution will look like:
     // ./main --dt 0.001 --T 10.0 --Nx 101 --Ny 101 --a 0.75 --b 0.06 --mu1 5.0 --mu2 0.0 --eps 50.0
@@ -65,7 +65,8 @@ int main(int argc, const char *argv[]){
 
     // Solving the PDEs!
     myAwesomeSolver.solve();
-    
+    // myAwesomeSolver.openmp_fun();
+
     // Writing the solution to output.txt
     myAwesomeSolver.writeToFile();
 

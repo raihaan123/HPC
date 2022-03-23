@@ -1,0 +1,16 @@
+### Start Wed Mar 23 00:09:38 2022
+# /apps/dev-studio/12.6/bin/../bin/er_archive -n -O /home/ru19/HPC/HPC/CPP/src/initial1.er/er_archive.log /home/ru19/HPC/HPC/CPP/src/initial1.er
+Copying `/home/ru19/HPC/HPC/CPP/src/main'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/main_VFTAuc075i5'
+Copying `/usr/lib/x86_64-linux-gnu/libm-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libm-2.31.so_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.74.0'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libboost_chrono.so.1.74.0_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/librt-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/librt-2.31.so_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libpthread-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libpthread-2.31.so_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libdl-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libdl-2.31.so_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libc-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libc-2.31.so_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libgcc_s.so.1'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libgcc_s.so.1_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libgomp.so.1.0.0_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libstdc++.so.6.0.28_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libboost_timer.so.1.74.0'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libboost_timer.so.1.74.0_dnWuQRcLhw9'
+Copying `/usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.74.0'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libboost_program_options.so.1.74.0_dnWuQRcLhw9'
+Copying `/apps/dev-studio/12.6/lib/analyzer/amd64/runtime/libcollector.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/libcollector.so_kN_xj2QRtH5'
+Copying `/usr/lib/x86_64-linux-gnu/ld-2.31.so'  to `/home/ru19/HPC/HPC/CPP/src/initial1.er/archives/ld-2.31.so_dnWuQRcLhw9'

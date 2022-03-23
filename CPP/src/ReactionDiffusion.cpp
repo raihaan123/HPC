@@ -1,33 +1,20 @@
 #include "ReactionDiffusion.h"
-#include <omp.h>
 #include <iostream>
 #include <fstream>
 #include <boost/timer/timer.hpp>
 
 #include <omp.h>
-// #include <cblas.h>
-
-#define F77NAME(x) x##_
-
-// Matrix matrix multiplication with BLAS
-extern "C" {
-	void F77NAME(dgemm)(char *transa, char *transb,
-						const int& m, const int& n, const int& k,
-						const double& alpha, double *a,
-						const int& lda, double *b, const int& ldb,
-						const double& beta, double *c, const int& ldc);
-}
 
 
-// Constructor with initializer list
+// Constructor
 ReactionDiffusion::ReactionDiffusion(){
-	std::cout << "Constructing ReactionDiffusion object..." << std::endl;
-
+	std::cout << "\nConstructing ReactionDiffusion object...\n" << std::endl;
 }
+
 
 // Destructor
 ReactionDiffusion::~ReactionDiffusion(){
-	std::cout << "Destructing ReactionDiffusion object..." << std::endl;
+	std::cout << "\nDestructing ReactionDiffusion object..." << std::endl;
 
 	// Free memory
 	delete[] U;
@@ -35,6 +22,7 @@ ReactionDiffusion::~ReactionDiffusion(){
 }
 
 
+// Set parameters for the solver
 void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, double a, double b, double mu1, double mu2, double eps){
 	// Set parameters to class attributes - 'this' is a pointer to the initialised object!
 	this->dt = dt;
@@ -43,8 +31,8 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	this->Ny = Ny;
 	this->a = a;
 	this->b = b;
-	this->mu1 = mu1;
-	this->mu2 = mu2;
+	this->mu1 = mu1 * dt;       // mu1 is multiplied by dt to avoid repeated multiplication in the code
+	this->mu2 = mu2 * dt;       // mu2 is multiplied by dt to avoid repeated multiplication in the code
 	this->eps = eps;
 
 	// Allocate memory for U and V
@@ -55,17 +43,9 @@ void ReactionDiffusion::setParameters(double dt, double T, int Nx, int Ny, doubl
 	dU = new double[Nx*Ny];
 	dV = new double[Nx*Ny];
 
-	// Allocate memory for A (2x2 general matrix)
-	A = new double[2*2];
-
-	// Building the fundamental shift matrix A
-	A[0] = -1.0;
-	A[1] = 1.0;
-	A[2] = 1.0;
-	A[3] = -1.0;
-
-	std::cout << "Matrix A: " << std::endl;
-	printFullMatrix(A, 2, 2);
+    // // Allocate memory for f1 and f2
+    // f1 = new double[Nx*Ny];
+    // f2 = new double[Nx*Ny];
 
 }
 
@@ -91,16 +71,6 @@ void ReactionDiffusion::setInitialConditions(){
 	// Allocate memory for U and V - all zero
 	U = new double[Nx*Ny];
 	V = new double[Nx*Ny];
-
-	// Allocate memory for f1 and f2
-	f1 = new double[Nx*Ny];
-	f2 = new double[Nx*Ny];
-
-	// All zero elements
-	for (int i = 0; i < Nx*Ny; i++){
-		U[i] = 0.0;
-		V[i] = 0.0;
-	}
 	
 	// Set the initial conditions
 	boost::timer::cpu_timer InitialConditions;
@@ -115,27 +85,11 @@ void ReactionDiffusion::setInitialConditions(){
 			}
 		}
 	}
+
 	std::cout << "\nTime to set initial conditions: " << InitialConditions.format() << " seconds" << std::endl;
-
-	// // Print the initial conditions
-	// std::cout << "U matrix (Initial):\n" << std::endl;
-	// printFullMatrix(U, Nx, Ny);
-
-	// std::cout << "V matrix (Intial):\n" << std::endl;
-	// printFullMatrix(V, Nx, Ny);
 
 }
 
-
-// Reaction terms for the PDEs
-// void ReactionDiffusion::solve_f1(){
-// 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
-// 	for (int row = 0; row < Nx; ++row){
-// 		for (int col = 0; col < Ny; ++col){
-// 			f1[row*Ny + col] = eps * U[row*Ny + col] * (1.0 - U[row*Ny + col]) * (U[row*Ny + col] - (V[row*Ny + col] + b)/a);
-// 		}
-// 	}
-// }
 
 double ReactionDiffusion::solve_f1(double& u, double& v){
 	// return eps * u * (1.0 - u) * (u - (v + b)/a);
@@ -143,128 +97,131 @@ double ReactionDiffusion::solve_f1(double& u, double& v){
 }
 
 
-// void ReactionDiffusion::solve_f2(){
-// 	// return u * u * u - v;
-// 	for (int row = 0; row < Nx; ++row){
-// 		for (int col = 0; col < Ny; ++col){
-// 			f2[row*Ny + col] = U[row*Ny + col] * U[row*Ny + col] * U[row*Ny + col] - V[row*Ny + col];
-// 		}
-// 	}
-// }
-
 double ReactionDiffusion::solve_f2(double& u, double& v){
 	// return u * u * u - v;
 	return u * u * u - v;
 }
 
 
-/* Solver
+void ReactionDiffusion::openmp_fun(){
 
---> The solution domain will be grouped into 'cells' of size dx*dy=1*1 - so 4 nodes per cell - so in total (Nx-1)*(Ny-1) cells
---> Each cell will be solved independently - these will be OpenMP tasks allocated to the team of threads
-	--> f1 and f2 will be solved for each node in the cell - added to the dU and dV arrays
-	--> A simplified Laplacian function will be applied to each node in the cell (AU + UA and AV + VA) - also added to the dU and dV arrays (reduced)
-	-->	Once all the cells have been solved, the dU and dV arrays will update the U and V arrays respectively
---> The threads will be decoupled from any specific cell - they will be assigned to cells in a round-robin fashion
+	int nthreads, thread_id;
 
-*/
+	#pragma omp parallel private(thread_id)
+	{
+		thread_id = omp_get_thread_num();
+
+		#pragma omp master
+		{
+			nthreads = omp_get_num_threads();
+			std::cout << "Number of threads = " << nthreads << std::endl;
+		}
+
+		// each thread prints its ID
+		#pragma omp critical
+		std::cout << "Hello World from thread " << thread_id << std::endl;
+	}
+
+}
 
 
 void ReactionDiffusion::solve()
 {
-
-	temp1 = new double[2*2];
-	temp2 = new double[2*2];
-	temp3 = new double[2*2];
-	temp4 = new double[2*2];
-
-	temp12 = new double[2*2];
-	temp34 = new double[2*2];
-
 	boost::timer::cpu_timer Solver;
 
-	for (double t = dt; t <= T; t += dt){	
-		
-		// // Recalculate f1 and f2
-		// solve_f1();
-		// solve_f2();
+	for (double t = dt; t <= T; t += dt){
 
-		// Reset the dU and dV arrays
-		for (int i = 0; i < Nx*Ny; i++){
-			dU[i] = 0.0;
-			dV[i] = 0.0;
-		}
+        // OpenMP parallelisation - each thread solves a different part of the grid - use tasks
 
-		// Each thread will have a private temp1 temp2 temp3 temp4 arrays of size 2x2 - these will be used to store the results of the twobytwo matrix multiplication
-		// The result will be added to the dU and dV arrays after all the cells have been solved and the threads are rejoined
+        // Solve the diffusion equation - iterate over all interior nodes
 
-		// Iterate through the cells - note will need a loop over the rows and columns of the grid to Nx-1 and row*Ny-1
-		// #pragma omp parallel for schedule(dynamic)
-		for (int row = 0; row < Ny-1; ++row){
-			// #pragma omp parallel for
-			for (int cell = row*Nx; cell < (row+1)*Nx-1; ++cell){
+        #pragma omp parallel for
+        for (int row = 1; row < Ny-1; ++row){
+            #pragma omp parallel for
+            for (int inner_node = row*Ny+1; inner_node < (row+1)*Nx-1; ++inner_node){
 
-				// For U
-				TwoByTwo(A, 2, &U[cell], Nx, temp1);
-				TwoByTwo(&U[cell], Nx, A, 2, temp2);
+                // Apply the Laplacian stencil to the interior nodes
+                dU[inner_node] = -4.0*U[inner_node] + U[inner_node-1] + U[inner_node+1] + U[inner_node-Ny] + U[inner_node+Ny];
+                dV[inner_node] = -4.0*V[inner_node] + V[inner_node-1] + V[inner_node+1] + V[inner_node-Ny] + V[inner_node+Ny];
+            }
+        }
+        
+        // Apply the boundary conditions to all edges and corners
+        // ------------------------------------------------------         
 
-				// temp12 = temp1 + temp2
-				for (int i = 0; i < 2*2; i++){
-					temp12[i] = temp1[i] + temp2[i];
-				}
-				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, A, 2, &U[cell], Nx, 1.0, &dU[cell], Nx);
-				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu1, &U[cell], Nx, A, 2, 1.0,	&dU[cell], Nx);
-				
-				// For V
-				TwoByTwo(A, 2, &V[cell], Nx, temp3);
-				TwoByTwo(&V[cell], Nx, A, 2, temp4);
+        // Top edge
+        #pragma omp parallel for
+        for (int col = 1; col < Nx-1; ++col){
+            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col+Ny];
+            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col+Ny];
+        }
 
-				// temp34 = temp3 + temp4
-				for (int i = 0; i < 2*2; i++){
-					temp34[i] = temp3[i] + temp4[i];
-				}
-				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, A, 2, &V[cell], Nx, 1.0, &dV[cell], Nx);
-				// F77NAME(dgemm)("N", "N", 2, 2, 2, mu2, &V[cell], Nx, A, 2, 1.0, &dV[cell], Nx);
+        // Bottom edge
+        #pragma omp parallel for
+        for (int col = (Ny-1)*Nx+1; col < Ny*Nx-1; ++col){
+            dU[col] = -3.0*U[col] + U[col-1] + U[col+1] + U[col-Ny];
+            dV[col] = -3.0*V[col] + V[col-1] + V[col+1] + V[col-Ny];
+        }
 
-				// Add the results to the dU and dV arrays
-				// #pragma omp parallel for
 
-				# pragma omp critical
-				for (int y_shift = 0; y_shift < 2; ++y_shift){
-					for (int x_shift = 0; x_shift < 2; ++x_shift){
-						dU[cell + x_shift + y_shift*Nx] += mu1 * temp12[x_shift + y_shift*2] + solve_f1(U[cell + x_shift + y_shift*Nx], V[cell + x_shift + y_shift*Nx]);
-						dV[cell + x_shift + y_shift*Nx] += mu2 * temp34[x_shift + y_shift*2] + solve_f2(U[cell + x_shift + y_shift*Nx], V[cell + x_shift + y_shift*Nx]);
-					}
-				}
+        // Left and right edges - memory is non-contiguous - U and V are row-major, so can solve both edges in parallel
+        #pragma omp parallel for
+        for (int row = 1; row < Ny-1; ++row){
+            dU[row*Ny] = -3.0*U[row*Ny] + U[(row+1)*Ny] + U[(row-1)*Ny] + U[row*Ny+1];     // Left edge
+            dV[row*Ny] = -3.0*V[row*Ny] + V[(row+1)*Ny] + V[(row-1)*Ny] + V[row*Ny+1];     // Left edge
 
-				// for (int i = 0; i < 2; ++i){
-				// 	for (int j = 0; j < 2; ++j){
-				// 		std::cout << "dU[" << cell + i*Ny + j << "] = " << dU[cell + i*Ny + j] << std::endl;
-				// 	}
-				// }
-			
-			// std::cout << "Row: " << row << std::endl;
+            dU[(row+1)*Ny-1] = -3.0*U[(row+1)*Ny-1] + U[(row+1)*Ny-2] + U[(row)*Ny-1] + U[(row+2)*Ny-1];     // Right edge
+            dV[(row+1)*Ny-1] = -3.0*V[(row+1)*Ny-1] + V[(row+1)*Ny-2] + V[(row)*Ny-1] + V[(row+2)*Ny-1];     // Right edge
+        }
 
-			}
 
-		}
+        // Top left corner
+        dU[0] = -2.0*U[0] + U[1] + U[Ny];
+        dV[0] = -2.0*V[0] + V[1] + V[Ny];
 
-		// Update the U and V arrays
-		for (int node = 0; node < Nx*Ny; ++node){
-			U[node] += dt * dU[node];
-			V[node] += dt * dV[node];
-		}
 
-		std::cout << "Solver Time: " << t << std::endl;
-		
-	}
+        // Top right corner
+        dU[Nx-1] = -2.0*U[Nx-1] + U[Nx-2] + U[Nx+Ny-1];
+        dV[Nx-1] = -2.0*V[Nx-1] + V[Nx-2] + V[Nx+Ny-1];
+
+
+        // Bottom left corner
+        dU[Nx*(Ny-1)] = -2.0*U[Nx*(Ny-1)] + U[Nx*(Ny-1)+1] + U[Nx*(Ny-2)];
+        dV[Nx*(Ny-1)] = -2.0*V[Nx*(Ny-1)] + V[Nx*(Ny-1)+1] + V[Nx*(Ny-2)];
+
+
+        // Bottom right corner
+        dU[Nx*Ny-1] = -2.0*U[Nx*Ny-1] + U[Nx*Ny-2] + U[Nx*(Ny-1)-1];
+        dV[Nx*Ny-1] = -2.0*V[Nx*Ny-1] + V[Nx*Ny-2] + V[Nx*(Ny-1)-1];
+
+
+        // // Solve f1 and f2 for each node
+        // #pragma omp parallel for
+        // for (int node = 0; node < Nx*Ny; ++node){
+        //     f1[node] = solve_f1(U[node], V[node]);
+        //     f2[node] = solve_f2(U[node], V[node]);
+        // }
+
+        // Update the U and V values
+        #pragma omp parallel for
+        for (int node = 0; node < Nx*Ny; ++node){
+            U[node] += mu1*dU[node] + dt*solve_f1(U[node], V[node]);
+            V[node] += mu2*dV[node] + dt*solve_f2(U[node], V[node]);
+        }
+
+        // std::cout << "Simulation time: " << t << std::endl;
+    }
+
+
+
+
+
+
+
 	
-	printFullMatrix(U, Nx, Ny);
 	std::cout << "Time to solve: " << Solver.format() << " seconds" << std::endl;
+
 }
-
-
-
 
 
 
@@ -272,7 +229,7 @@ void ReactionDiffusion::writeToFile(){
 	std::ofstream outfile;
 	outfile.open("output.txt");
 
-	// Print the solution to the file - format: x y u v
+	// Print the solution to the file - format: [x y u v]
 	for (int row = 0; row < Nx; ++row){
 		for (int col = 0; col < Ny; ++col){
 			outfile << row*dx << " " << col*dy << " " << U[row*Ny + col] << " " << V[row*Ny + col] << std::endl;
@@ -287,9 +244,8 @@ void ReactionDiffusion::writeToFile(){
 
 
 
-
-
 /* Helper functions! */
+
 
 void printFullMatrix(double* A, int Nx, int Ny){
 	for (int row = 0; row < Nx; ++row){
@@ -299,32 +255,6 @@ void printFullMatrix(double* A, int Nx, int Ny){
 		std::cout << std::endl;
 	}
 }
-
-void printBandedSymmetricMatrix(double* A, int N){
-	for (int row = 0; row < 2; row++){
-        for (int col = 0; col < N; col++){
-            std::cout << A[row*N + col] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-}
-
-
-// TwoByTwoMatrixMultiplication - multiplies two 2x2 matrices and returns the result in a 2x2 matrix - all matrices are stored in row major order
-void TwoByTwo(double* A, int lda, double* B, int ldb, double* C){
-
-	// Multiply the two matrices
-	for (int col = 0; col < 2; ++col){
-		for (int row = 0; row < 2; ++row){
-			C[0] = A[0] * B[0] + A[1] * B[ldb];
-			C[1] = A[0] * B[1] + A[1] * B[1 + ldb];
-			C[2] = A[lda] * B[0] + A[1 + lda] * B[ldb];
-			C[3] = A[lda] * B[1] + A[1 + lda] * B[1 + ldb];
-		}
-	}
-}
-
 
 
 void GNUPlot(){
@@ -337,5 +267,4 @@ void GNUPlot(){
 	
 	// Run the commands to the terminal 
 	system("gnome-terminal -e 'bash -c \"set pm3d at st; set view map; set cbrange[0:1]; splot \'output.txt\' using 1:2:3 w l palette; set term x11; set output; pause -1;\"'");
-
 }
