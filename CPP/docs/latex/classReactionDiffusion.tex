@@ -1,0 +1,124 @@
+\hypertarget{classReactionDiffusion}{}\doxysection{Reaction\+Diffusion Class Reference}
+\label{classReactionDiffusion}\index{ReactionDiffusion@{ReactionDiffusion}}
+
+
+Solve the reaction-\/diffusion equation using the finite difference method and in parallel.  
+
+
+
+
+{\ttfamily \#include $<$Reaction\+Diffusion.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classReactionDiffusion_aec8f8847d467150fadf10bca4376e877}{Reaction\+Diffusion}} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classReactionDiffusion_aa6452e9048ecece5392560fa8fda051d}{$\sim$\+Reaction\+Diffusion}} ()
+\begin{DoxyCompactList}\small\item\em Default destructor. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classReactionDiffusion_aa9bddacd1e90dfc0d8cb37228ad2cc94}{set\+Parameters}} (double dt, double T, int Nx, int Ny, double a, double b, double mu1, double mu2, double eps)
+\begin{DoxyCompactList}\small\item\em Set Parameters. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classReactionDiffusion_ab72d5f96ca87bdd9948d70b39774ee72}{set\+Initial\+Conditions}} ()
+\begin{DoxyCompactList}\small\item\em Set the initial conditions for U and V. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classReactionDiffusion_a83ae170ed97ee591a9bf4b87a1e0717f}{Time\+Integrate}} ()
+\begin{DoxyCompactList}\small\item\em Solution loop. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classReactionDiffusion_acbd2c00de9baecfeb29cf47d32dca28c}{write\+To\+File}} ()
+\begin{DoxyCompactList}\small\item\em Write the solution to a file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Solve the reaction-\/diffusion equation using the finite difference method and in parallel. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classReactionDiffusion_aec8f8847d467150fadf10bca4376e877}\label{classReactionDiffusion_aec8f8847d467150fadf10bca4376e877}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!ReactionDiffusion@{ReactionDiffusion}}
+\index{ReactionDiffusion@{ReactionDiffusion}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{ReactionDiffusion()}{ReactionDiffusion()}}
+{\footnotesize\ttfamily Reaction\+Diffusion\+::\+Reaction\+Diffusion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Default constructor. 
+
+\mbox{\Hypertarget{classReactionDiffusion_aa6452e9048ecece5392560fa8fda051d}\label{classReactionDiffusion_aa6452e9048ecece5392560fa8fda051d}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!````~ReactionDiffusion@{$\sim$ReactionDiffusion}}
+\index{````~ReactionDiffusion@{$\sim$ReactionDiffusion}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{$\sim$ReactionDiffusion()}{~ReactionDiffusion()}}
+{\footnotesize\ttfamily Reaction\+Diffusion\+::$\sim$\+Reaction\+Diffusion (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Default destructor. 
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classReactionDiffusion_ab72d5f96ca87bdd9948d70b39774ee72}\label{classReactionDiffusion_ab72d5f96ca87bdd9948d70b39774ee72}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!setInitialConditions@{setInitialConditions}}
+\index{setInitialConditions@{setInitialConditions}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{setInitialConditions()}{setInitialConditions()}}
+{\footnotesize\ttfamily void Reaction\+Diffusion\+::set\+Initial\+Conditions (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Set the initial conditions for U and V. 
+
+For y$>$ly/2, U = 1, 0 everywhere else
+
+For x$<$lx/2, V = a/2, 0 everywhere else Lx and Ly are always integers -\/ Nx and Ny are odd integers\mbox{\Hypertarget{classReactionDiffusion_aa9bddacd1e90dfc0d8cb37228ad2cc94}\label{classReactionDiffusion_aa9bddacd1e90dfc0d8cb37228ad2cc94}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!setParameters@{setParameters}}
+\index{setParameters@{setParameters}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{setParameters()}{setParameters()}}
+{\footnotesize\ttfamily void Reaction\+Diffusion\+::set\+Parameters (\begin{DoxyParamCaption}\item[{double}]{dt,  }\item[{double}]{T,  }\item[{int}]{Nx,  }\item[{int}]{Ny,  }\item[{double}]{a,  }\item[{double}]{b,  }\item[{double}]{mu1,  }\item[{double}]{mu2,  }\item[{double}]{eps }\end{DoxyParamCaption})}
+
+
+
+Set Parameters. 
+
+Set the parameters for the solver 
+\begin{DoxyParams}{Parameters}
+{\em dt} & time step \\
+\hline
+{\em T} & final time \\
+\hline
+{\em Nx} & number of grid points in x-\/direction \\
+\hline
+{\em Ny} & number of grid points in y-\/direction \\
+\hline
+{\em a} & reaction rate \\
+\hline
+{\em b} & diffusion rate \\
+\hline
+{\em mu1} & reaction term \\
+\hline
+{\em mu2} & diffusion term \\
+\hline
+{\em eps} & epsilon \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classReactionDiffusion_a83ae170ed97ee591a9bf4b87a1e0717f}\label{classReactionDiffusion_a83ae170ed97ee591a9bf4b87a1e0717f}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!TimeIntegrate@{TimeIntegrate}}
+\index{TimeIntegrate@{TimeIntegrate}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{TimeIntegrate()}{TimeIntegrate()}}
+{\footnotesize\ttfamily void Reaction\+Diffusion\+::\+Time\+Integrate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Solution loop. 
+
+\mbox{\Hypertarget{classReactionDiffusion_acbd2c00de9baecfeb29cf47d32dca28c}\label{classReactionDiffusion_acbd2c00de9baecfeb29cf47d32dca28c}} 
+\index{ReactionDiffusion@{ReactionDiffusion}!writeToFile@{writeToFile}}
+\index{writeToFile@{writeToFile}!ReactionDiffusion@{ReactionDiffusion}}
+\doxysubsubsection{\texorpdfstring{writeToFile()}{writeToFile()}}
+{\footnotesize\ttfamily void Reaction\+Diffusion\+::write\+To\+File (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Write the solution to a file. 
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{ReactionDiffusion_8h}{Reaction\+Diffusion.\+h}}\item 
+\mbox{\hyperlink{ReactionDiffusion_8cpp}{Reaction\+Diffusion.\+cpp}}\end{DoxyCompactItemize}
